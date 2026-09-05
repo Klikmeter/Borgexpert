@@ -46,7 +46,9 @@ export function interneMail(rij, cfg) {
   const text = `Nieuwe aanvraag via ${cfg.appUrl || 'de bouwstop-pagina'}\n\n` + v.map(([k, w]) => `${k}: ${w}`).join('\n') + `\n\nBeantwoord deze mail om de aanvrager direct te bereiken.`;
   const rows = v.map(([k, w]) => `<tr><td style="padding:6px 12px 6px 0;color:#666;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:6px 0;vertical-align:top">${esc(w).replace(/\n/g, '<br>')}</td></tr>`).join('');
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#333;line-height:1.5"><p>Nieuwe aanvraag via ${esc(cfg.appUrl || 'de bouwstop-pagina')}.</p><table cellpadding="0" cellspacing="0" style="border-collapse:collapse">${rows}</table><p style="color:#666;font-size:13px">Beantwoord deze mail om de aanvrager direct te bereiken.</p></div>`;
-  return { from: cfg.emailFrom, to: [cfg.emailTo], reply_to: rij.email, subject, text, html, idempotencyKey: `intern-${rij.ref}` };
+  const m = { from: cfg.emailFrom, to: cfg.emailTo.split(',').map((x) => x.trim()).filter(Boolean), reply_to: rij.email, subject, text, html, idempotencyKey: `intern-${rij.ref}` };
+  if (cfg.emailBcc?.length) m.bcc = cfg.emailBcc;
+  return m;
 }
 
 /** Bevestiging aan de aanvrager. */

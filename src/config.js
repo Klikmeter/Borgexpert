@@ -16,6 +16,8 @@ export function loadConfig(env = process.env) {
 
     emailFrom: env.EMAIL_FROM || 'Borg Expert <aanvraag@borgexpert.online>',
     emailTo: env.EMAIL_TO || 'info@borgexpert.nl',
+    // Optioneel: extra ontvangers van de aanvraagmail als blinde kopie, kommagescheiden (bijv. voor controle).
+    emailBcc: (env.EMAIL_BCC || '').split(',').map((x) => x.trim()).filter(Boolean),
     confirmationEmail: bool(env.CONFIRMATION_EMAIL, true),
     turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
     turnstileSecretKey: env.TURNSTILE_SECRET_KEY || '',

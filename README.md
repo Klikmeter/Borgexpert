@@ -42,7 +42,8 @@ test/               node:test, draait zonder database (`npm test`)
 | `DATABASE_URL` | reference naar Postgres |
 | `RESEND_API_KEY` | uit resend.com > API Keys (permission "Sending access") |
 | `EMAIL_FROM` | `Borg Expert <aanvraag@borgexpert.online>` |
-| `EMAIL_TO` | `info@borgexpert.nl` |
+| `EMAIL_TO` | `info@borgexpert.nl` (meerdere mag, met komma's) |
+| `EMAIL_BCC` | optioneel, blinde kopie van elke aanvraagmail |
 | `APP_URL` | `https://www.borgexpert.online` |
 | `CANONICAL_REDIRECT` | `false` tot het domein werkt, daarna `true` |
 | `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | uit Cloudflare Turnstile, zie stap 5 |

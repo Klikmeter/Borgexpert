@@ -58,3 +58,11 @@ test('Resend-mailer stuurt het juiste verzoek en meldt fouten leesbaar', async (
   const zonderKey = createResendMailer({ apiKey: '', log: {} });
   await assert.rejects(zonderKey.send(bevestigingsMail(rij(), cfg)), /RESEND_API_KEY ontbreekt/);
 });
+
+test('interne mail: meerdere ontvangers en blinde kopie via variabelen', () => {
+  const c2 = loadConfig({ EMAIL_TO: 'info@borgexpert.nl, planning@borgexpert.nl', EMAIL_BCC: 'nick@spaiker.nl' });
+  const m = interneMail(rij(), c2);
+  assert.deepEqual(m.to, ['info@borgexpert.nl', 'planning@borgexpert.nl']);
+  assert.deepEqual(m.bcc, ['nick@spaiker.nl']);
+  assert.equal(interneMail(rij(), cfg).bcc, undefined);
+});
