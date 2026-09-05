@@ -1,0 +1,24 @@
+{
+  "name": "borgexpert-bouwstop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tijdelijke aanvraagpagina Borg Expert Bouwstop: statische pagina + aanvraag-endpoint (Postgres + Resend) voor Railway",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test \"test/**/*.test.js\"",
+    "fonts": "node scripts/copy-fonts.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "hono": "^4.6.0",
+    "pg": "^8.13.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@fontsource/raleway": "^5.1.0",
+    "@fontsource/roboto-slab": "^5.1.0"
+  },
+  "engines": { "node": ">=20" }
+}
