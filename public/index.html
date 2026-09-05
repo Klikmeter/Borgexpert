@@ -230,7 +230,6 @@ section.alt{background:var(--white)}
 .pill.crit{background:var(--crit-bg);color:var(--crit)}.pill.crit i{background:var(--crit)}
 .situ{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 30px}
 .situ span{background:var(--ground-2);border:1px solid var(--line-soft);border-radius:999px;padding:6px 14px;font-size:13.5px;color:var(--ink)}
-.verdict{font-size:17px;line-height:1.65;color:var(--ink);max-width:62ch;margin-bottom:34px;padding:20px 24px;border-left:3px solid var(--blue);background:var(--blue-tint);border-radius:0 8px 8px 0}
 .plan-steps{list-style:none;padding:0;margin:0;display:grid;gap:0;counter-reset:s}
 .plan-steps li{display:grid;grid-template-columns:118px 1fr;gap:18px;padding:22px 0;border-top:1px solid var(--line-soft)}
 .plan-steps li:last-child{border-bottom:1px solid var(--line-soft)}
@@ -470,7 +469,6 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
           <div class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><div><h3>Bedankt voor je aanvraag</h3><p id="done-text"></p></div></div>
           <div class="plan-head"><div><p class="eyebrow">Jouw plan van aanpak</p><h3 id="plan-title" style="margin-top:8px"></h3></div><span class="pill" id="plan-pill"></span></div>
           <div class="situ" id="situ"></div>
-          <p class="verdict" id="verdict"></p>
           <ol class="plan-steps" id="plan-steps"></ol>
           <div class="plan-foot">
             <div class="box"><h4>Wat wij van jou nodig hebben</h4><ul id="need"></ul></div>
@@ -743,12 +741,10 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     situ.push(d.vergunning === 'ja' ? 'Omgevingsvergunning toegekend' : d.vergunning === 'nee' ? 'Omgevingsvergunning nog niet toegekend' : 'Omgevingsvergunning: onbekend');
     if (d.type) situ.push(d.type);
     if (d.rapport === 'ja') situ.push('Rapportages beschikbaar');
+    if (d.plan === 'ja') situ.push('Borgingsplan in bezit');
+    if (d.borger && d.borger !== 'weet') situ.push('Vorige borger: ' + (d.borger === 'anders' ? (d.borgeranders || 'andere partij') : d.borger.replace(/\s*\(.*\)$/, '')));
+    if (d.wanneer) situ.push('Weer verder: ' + d.wanneer.toLowerCase());
     if (d.rol === 'aannemer' && d.stil) situ.push(d.stil + ' project' + (d.stil > 1 ? 'en' : '') + ' stil');
-    const verdict = {
-      ok: `${first ? first + ', j' : 'J'}e project zit in een fase waarin nog geen constructiewerk verborgen is. Dat maakt een overname overzichtelijk: wij kunnen de borging vanaf hier opnieuw opbouwen zonder terug te hoeven kijken.`,
-      warn: `${first ? first + ', e' : 'E'}r is al constructiewerk uitgevoerd dat we zelf niet meer kunnen zien. Omdat je rapportages of foto's van de vorige borger hebt, is de kans groot dat we dat kunnen afdekken. In het gesprek nemen we samen door wat je hebt en wat we nog nodig hebben.`,
-      crit: `${first ? first + ', e' : 'E'}r is al constructiewerk uitgevoerd dat we zelf niet meer kunnen zien, en er lijkt weinig van vastgelegd. Vaak zijn er andere manieren om het aan te tonen. In het gesprek bekijken we samen wat er wél is voordat we iets beloven.`
-    }[t];
     const steps = [];
     steps.push({when: 'Nu', h: 'Je aanvraag is bij ons binnen', p: `We hebben je gegevens en bouwfase ontvangen. Je krijgt een bevestiging met je referentie per mail op ${d.email || 'je e-mailadres'}.`});
     steps.push({when: 'Uiterlijk ' + nextWorkday(), h: 'Een kwaliteitsborger belt je', p: t === 'ok' ? 'We bevestigen de overname, spreken de planning af en leggen uit wat de wisseling betekent voor je contract met de aannemer.' : t === 'warn' ? 'We nemen de rapportages van je vorige borger door, bespreken welke controlemomenten daarmee zijn afgedekt en wat de overname inhoudt en kost. Kan het niet, dan zeggen we dat direct en helpen we je verder.' : 'We lopen samen na wat er wél is vastgelegd, denk aan foto\'s van de aannemer, betonstaalcertificaten of leveringsbonnen, en bespreken wat de overname inhoudt en kost. Kan het niet, dan zeggen we dat direct en helpen we je verder.'});
@@ -767,7 +763,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     if (hiddenWorkOngoing(f)) now.push('Laat de aannemer alles fotograferen wat binnenkort wordt afgedekt of gestort');
     if (d.vergunning === 'nee') now.push('Check de status van je omgevingsvergunning bij de gemeente. Zonder vergunning kan de bouw ook met een nieuwe borger niet starten');
     now.push('Bekijk je aannemingsovereenkomst: daar staat wie de kosten van de kwaliteitsborging draagt');
-    return {t, pill, situ, verdict, steps, need, now};
+    return {t, pill, situ, steps, need, now};
   }
   function hiddenWorkOngoing(f) { return f >= 1 && f <= 5; }
 
@@ -775,7 +771,6 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     $('#plan-title').textContent = (d.adres ? d.adres : 'Je project');
     const pill = $('#plan-pill'); pill.className = 'pill ' + plan.t; pill.innerHTML = '<i></i>' + plan.pill;
     $('#situ').innerHTML = plan.situ.map(s => `<span>${esc(s)}</span>`).join('');
-    $('#verdict').textContent = plan.verdict;
     $('#plan-steps').innerHTML = plan.steps.map(s => `<li><div class="when">${esc(s.when)}</div><div><h4>${esc(s.h)}</h4><p>${esc(s.p)}</p></div></li>`).join('');
     $('#need').innerHTML = plan.need.map(s => `<li>${esc(s)}</li>`).join('');
     $('#now').innerHTML = plan.now.map(s => `<li>${esc(s)}</li>`).join('');
