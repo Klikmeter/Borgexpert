@@ -37,6 +37,7 @@ test('bevestigingsmail: naar de aanvrager, met referentie, telefoon en WhatsApp-
   assert.ok(!m.html.includes('06 86 80 00 95') && !m.text.includes('06 86 80 00 95'), 'nummer niet zichtbaar');
   assert.ok(!m.html.includes('#25D366'), 'geen groene knop meer');
   assert.match(m.html, /BE-2609-ABCDE/);
+  assert.match(m.html, /<a href="https:\/\/borgexpert.nl\/projecten\/"[^>]*>Klik hier<\/a>/);
 });
 
 test('Resend-mailer stuurt het juiste verzoek en meldt fouten leesbaar', async () => {
