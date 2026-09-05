@@ -55,6 +55,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn:disabled{opacity:.55;cursor:default}
 
 /* ---------- header + hero ---------- */
+:root{--overlap:400px}
 .hero{position:relative;color:#fff;isolation:isolate;border-bottom-right-radius:96px}
 .hero .bg{position:absolute;inset:0;z-index:-2;border-bottom-right-radius:inherit;background:#1D54E9 url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAwIiBoZWlnaHQ9IjkwMCIgdmlld0JveD0iMCAwIDE2MDAgOTAwIj48ZGVmcz48cGF0dGVybiBpZD0iZyIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNNDggMEgwdjQ4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIuMTAiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48cGF0dGVybiBpZD0iRyIgd2lkdGg9IjI0MCIgaGVpZ2h0PSIyNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0yNDAgMEgwdjI0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utb3BhY2l0eT0iLjE2IiBzdHJva2Utd2lkdGg9IjEuNSIvPjwvcGF0dGVybj48cmFkaWFsR3JhZGllbnQgaWQ9InIiIGN4PSI4MiUiIGN5PSIxOCUiIHI9IjcwJSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNzU5NUYyIiBzdG9wLW9wYWNpdHk9Ii41NSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzEyNDRDRSIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjE2MDAiIGhlaWdodD0iOTAwIiBmaWxsPSIjMUQ1NEU5Ii8+PHJlY3Qgd2lkdGg9IjE2MDAiIGhlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI3IpIi8+PHJlY3Qgd2lkdGg9IjE2MDAiIGhlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI2cpIi8+PHJlY3Qgd2lkdGg9IjE2MDAiIGhlaWdodD0iOTAwIiBmaWxsPSJ1cmwoI0cpIi8+PGcgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIuMDciIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwNjAgLTQwKSBzY2FsZSg3LjIpIj48cG9seWdvbiBwb2ludHM9IjQyLjUyIDg1LjAyIDI0LjMzIDc0LjQxIDEyLjE3IDgxLjUxIDQyLjUyIDk5LjIxIDg1LjA0IDc0LjQxIDcyLjg3IDY3LjMxIDQyLjUyIDg1LjAyIi8+PHBvbHlnb24gcG9pbnRzPSI4NS4wMyAyNC44IDcyLjg2IDE3LjcgNzIuNDggMTcuNDcgNjEuNjIgMTEuMTQgNDIuNTIgMCAwIDI0LjggMCA2MC4yMSAwIDc0LjQxIDEyLjE3IDY3LjMxIDEyLjE3IDUzLjExIDEyLjE3IDMxLjkgNDIuNTIgMTQuMTkgNTguMTQgMjMuMzEgNjAuNyAyNC44IDY4Ljk5IDI5LjY0IDcyLjg2IDMxLjkgNzIuODcgMzEuOSA3Mi44NyA0Ni4wOSA3Mi44NyA1My4xMSA4NS4wNCA2MC4yMSA4NS4wNCAzOC45OSA4NS4wNCAyNC44IDg1LjAzIDI0LjgiLz48ZWxsaXBzZSBjeD0iMjcuMzYiIGN5PSI0OC4zMiIgcng9IjUuOCIgcnk9IjUuODYiLz48ZWxsaXBzZSBjeD0iNDIuNTIiIGN5PSI0OC4zMiIgcng9IjUuOCIgcnk9IjUuODYiLz48ZWxsaXBzZSBjeD0iNTcuNjgiIGN5PSI0OC4zMiIgcng9IjUuOCIgcnk9IjUuODYiLz48L2c+PC9zdmc+") center top/cover no-repeat}
 .hero .tint{position:absolute;inset:0;z-index:-1;border-bottom-right-radius:inherit;background:linear-gradient(180deg,rgba(18,68,206,0) 0%,rgba(18,68,206,.35) 100%)}
@@ -72,14 +73,17 @@ button,input,select,textarea{font:inherit;color:inherit}
 .promise-row div{display:flex;align-items:baseline;gap:10px}
 .promise-row .num{font-family:var(--slab);font-size:30px;font-weight:600;line-height:1;color:#fff;font-variant-numeric:tabular-nums}
 .promise-row .lbl{font-weight:600;font-size:14px;color:rgba(255,255,255,.9);line-height:1.2}
-.hero-form{width:min(820px,100%);margin-bottom:-96px;position:relative;z-index:1;text-align:left}
+.hero{padding-bottom:var(--overlap)}
+.form-stage{position:relative;z-index:1;margin-top:calc(-1 * var(--overlap))}
+.form-stage .wrap{display:grid;justify-items:center}
+.hero-form{width:min(820px,100%);text-align:left}
 .hero-form .saved{margin:12px 4px 0;color:var(--muted);justify-content:center}
 .hero-side{width:min(820px,100%);display:flex;flex-wrap:wrap;justify-content:center;gap:6px 28px;margin:22px auto 56px;text-align:center}
 .hero-side p{font-size:14.5px;line-height:1.65;color:var(--text)}
 .hero-side strong{color:var(--ink);font-weight:600}
 .hero-side a{color:var(--blue);font-weight:600;text-decoration:none}
 .hero-side a:hover{text-decoration:underline}
-.after-hero{padding-top:40px !important}
+.after-hero{padding-top:8px !important}
 
 /* ---------- sections ---------- */
 section.block{padding:80px 0}
@@ -97,6 +101,14 @@ section.alt{background:var(--white)}
 .step .n{font-family:var(--slab);font-size:15px;color:var(--blue);letter-spacing:1px}
 .step h3{font-size:19px;margin:10px 0 8px}
 .step p{color:var(--text);font-size:15px;line-height:1.7}
+.always{margin-top:56px;background:var(--blue-tint);border-radius:14px;padding:40px 44px;display:grid;grid-template-columns:1fr 1.5fr;gap:40px;align-items:start}
+.always-head h3{font-size:23px;line-height:1.25;margin:10px 0 12px}
+.always-head p:last-child{color:var(--text);font-size:15px;line-height:1.65}
+.always-list{list-style:none;margin:0;padding:0;display:grid;gap:20px;counter-reset:al}
+.always-list li{display:grid;grid-template-columns:32px 1fr;column-gap:16px;counter-increment:al}
+.always-list li::before{content:counter(al);grid-row:1/3;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--slab);font-size:15px;display:grid;place-items:center}
+.always-list b{font-weight:600;font-size:16px;color:var(--ink)}
+.always-list span{color:var(--text);font-size:15px;line-height:1.65;margin-top:4px}
 .trust{max-width:760px}
 .trust .photo{border-radius:10px;overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow)}
 .trust .photo img{width:100%;height:100%;object-fit:cover}
@@ -208,8 +220,8 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   .hero-text{padding:0 0 28px}
   .promise-row{display:none}
   .hero .lede{margin-top:12px;font-size:16px}
-  .hero-form{margin-bottom:-48px}
-  .after-hero{padding-top:24px !important}
+  :root{--overlap:260px}
+  .always{grid-template-columns:1fr;padding:28px 24px;gap:24px}
   .hero{border-bottom-right-radius:56px}
   .three,.steps{grid-template-columns:1fr}
   .step{border-right:0;margin-right:0;padding:26px 0;border-top:1px solid var(--line)}
@@ -257,6 +269,12 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
           <div><span class="num">0</span><span class="lbl">verplichte bijlagen</span></div>
         </div>
       </div>
+    </div>
+  </div>
+</header>
+
+<div class="form-stage">
+  <div class="wrap">
       <div class="hero-form">
         <form class="card" id="frm" novalidate>
           <div class="hp" aria-hidden="true"><label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
@@ -408,13 +426,12 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
       </div>
         <div class="saved" id="saved" hidden><i></i>Concept bewaard in je browser, je kunt later verder</div>
       </div>
-    </div>
   </div>
-</header>
+</div>
 
 
 <section class="block after-hero">
-  <div class="wrap" style="display:grid;justify-items:center;padding-top:112px">
+  <div class="wrap" style="display:grid;justify-items:center">
     <div class="hero-side">
       <p><strong>Liever meteen iemand spreken?</strong> Bel <a href="tel:+31857607278">(085) 760 72 78</a> of stuur een <a href="https://wa.me/31686800095" target="_blank" rel="noopener">WhatsApp</a>. Ook 's avonds bereikbaar.</p>
       <p>Kunnen we niet helpen? Dan zeggen we dat eerlijk en wijzen we je de weg naar een andere toegelaten borger.</p>
@@ -443,7 +460,19 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     <div class="steps">
       <div class="step"><div class="n">STAP 1 · Vandaag</div><h3>Je situatie in beeld</h3><p>Je vult het formulier in. Je ziet meteen welke stappen bij jouw bouwfase horen en wat wij eventueel nog van je nodig hebben.</p></div>
       <div class="step"><div class="n">STAP 2 · Binnen één werkdag</div><h3>Persoonlijk plan van aanpak</h3><p>Een kwaliteitsborger belt je, beoordeelt wat er is vastgelegd en bevestigt of en hoe we het project overnemen. Eerlijk: ook als het niet kan, hoor je dat direct.</p></div>
-      <div class="step"><div class="n">STAP 3 · Zodra je akkoord bent</div><h3>Wij melden, jij bouwt</h3><p>Wij verzorgen de melding bij de gemeente en plannen het eerste bouwplaatsbezoek. Daarna kan de bouw weer verder.</p></div>
+      <div class="step"><div class="n">STAP 3 · Zodra je akkoord bent</div><h3>Wij melden, jij bouwt</h3><p>Wij stemmen af met de gemeente, komen langs voor een nulmeting en bouwen het dossier verder op. Daarna kan de bouw weer verder.</p></div>
+    </div>
+    <div class="always">
+      <div class="always-head">
+        <p class="eyebrow">Bij elke opdracht</p>
+        <h3>Drie dingen doen we altijd, in welke bouwfase je ook zit</h3>
+        <p>Zo weten jij, de gemeente en wij precies waar het project staat op het moment dat wij het overnemen.</p>
+      </div>
+      <ol class="always-list">
+        <li><b>Nulmeting op locatie</b><span>We komen naar de bouwplaats en leggen vast wat er staat, wat al is afgedekt en wat we nog kunnen controleren. Dat is het vertrekpunt van ons dossier.</span></li>
+        <li><b>Overleg met de gemeente</b><span>We stemmen met het bevoegd gezag af dat Borg Expert de kwaliteitsborging overneemt en welke melding daarvoor nodig is. Jij hoeft daar niets voor in te dienen.</span></li>
+        <li><b>Dossier afronden</b><span>We bouwen het dossier op tot en met de gereedmelding, inclusief wat er vóór onze komst is vastgelegd. Zo kun je na oplevering aantonen dat de bouw aan de regels voldoet.</span></li>
+      </ol>
     </div>
   </div>
 </section>
@@ -590,7 +619,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     steps.push({when: 'Uiterlijk ' + nextWorkday(), h: 'Een kwaliteitsborger belt je', p: t === 'ok' ? 'We bevestigen de overname, spreken de planning af en leggen uit wat de wisseling betekent voor je contract met de aannemer.' : 'We bespreken de uitkomst van de beoordeling, wat de overname inhoudt en wat het kost. Kan het niet, dan zeggen we dat direct en helpen we je verder.'});
     if (d.dso === 'nee' || d.dso === 'weet') steps.push({when: 'Na je akkoord', h: 'Wij verzorgen de bouwmelding', p: 'We stellen het borgingsplan en de risicobeoordeling op en dienen de melding in via het Omgevingsloket. Vanaf de melding geldt een wachttermijn van vier weken voordat je mag starten.'});
     else steps.push({when: 'Na je akkoord', h: 'Wij melden de wisseling bij de gemeente', p: 'We informeren het bevoegd gezag dat Borg Expert de kwaliteitsborging overneemt en stemmen af of een aanvullende melding nodig is. Dat regelen wij, jij hoeft niets in te dienen.'});
-    steps.push({when: 'Daarna', h: f >= 7 ? 'Eindcontrole en dossier' : 'Eerste bouwplaatsbezoek', p: f >= 7 ? 'We controleren het uitgevoerde werk, maken het dossier compleet en begeleiden je naar de gereedmelding.' : 'We komen langs, leggen de huidige staat vast in het dossier en spreken de volgende controlemomenten af. Daarna kan de bouw weer verder.'});
+    steps.push({when: 'Daarna', h: 'Nulmeting op locatie', p: f >= 7 ? 'We komen langs, leggen de staat van het werk vast en maken het dossier compleet tot en met de gereedmelding.' : 'We komen langs, leggen de huidige staat vast als vertrekpunt van het dossier en spreken de volgende controlemomenten af. Daarna kan de bouw weer verder.'});
     const need = [];
     if (d.rapport !== 'ja') need.push('Alles wat je hebt van de vorige borger: rapportages, foto\'s, mails');
     else need.push('De rapportages en foto\'s van je vorige borger (mag als reactie op onze mail)');
