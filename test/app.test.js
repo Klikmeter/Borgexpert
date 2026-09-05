@@ -158,3 +158,38 @@ test('te grote body: 413', async () => {
 test('referentie: formaat en geen verwarrende tekens', () => {
   for (let i = 0; i < 200; i++) assert.match(nieuweRef(new Date('2026-09-05')), /^BE-2609-[A-HJ-NP-Z2-9]{5}$/);
 });
+
+test('adressuggesties: proxy naar PDOK-client, minimaal drie tekens, lookup geeft details', async () => {
+  const { app } = maakApp();
+  const kort = await (await app.request('https://www.borgexpert.online/api/adres/suggest?q=li')).json();
+  assert.deepEqual(kort.items, []);
+  const r = await app.request('https://www.borgexpert.online/api/adres/suggest?q=Lindelaan%208');
+  assert.equal(r.status, 200);
+  const j = await r.json();
+  assert.equal(j.items.length, 2);
+  assert.equal(j.items[0].label, 'Lindelaan 8, 7314AB Apeldoorn');
+  const l = await (await app.request('https://www.borgexpert.online/api/adres/lookup?id=adr-1a2b3c')).json();
+  assert.equal(l.adres.postcode, '7314AB');
+  assert.equal(l.adres.gemeente, 'Apeldoorn');
+  assert.equal((await app.request('https://www.borgexpert.online/api/adres/lookup?id=../etc')).status, 400);
+  assert.equal((await app.request('https://www.borgexpert.online/api/adres/lookup?id=adr-onbekend')).status, 404);
+});
+
+test('adressuggesties: zonder client blijft de pagina werken', async () => {
+  const { app } = maakApp({ adres: null });
+  const j = await (await app.request('https://www.borgexpert.online/api/adres/suggest?q=Lindelaan')).json();
+  assert.deepEqual(j.items, []);
+});
+
+test('gekozen adres: losse kolommen in de database en gemeente in de mail', async () => {
+  const { app, db, mailer } = maakApp();
+  const r = await post(app, { ...geldig(), adres: 'Lindelaan 8, 7314AB Apeldoorn', adres_id: 'adr-1a2b3c', adres_straat: 'Lindelaan', adres_huisnummer: '8', adres_postcode: '7314AB', adres_plaats: 'Apeldoorn', adres_gemeente: 'Apeldoorn' });
+  assert.equal(r.status, 200);
+  const rij = db.rows[0];
+  assert.equal(rij.adres_bag_id, 'adr-1a2b3c');
+  assert.equal(rij.adres_postcode, '7314AB');
+  assert.equal(rij.adres_gemeente, 'Apeldoorn');
+  await wacht();
+  assert.match(mailer.sent[0].text, /Gemeente: Apeldoorn/);
+  assert.equal((await post(app, { ...geldig(), adres_id: 'kwaad' })).status, 400);
+});

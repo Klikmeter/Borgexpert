@@ -35,9 +35,10 @@ export async function verstuurMails(rij, { db, mailer, cfg, log }) {
   }
 }
 
-export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log = console, now = () => new Date() }) {
+export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, log = console, now = () => new Date() }) {
   const app = new Hono();
   const limiter = createRateLimiter({ max: cfg.rateLimitMax, windowMs: cfg.rateLimitWindowMs });
+  const adresLimiter = createRateLimiter({ max: 120, windowMs: 60_000 });
 
   // Beveiligingsheaders + canonieke host
   app.use('*', async (c, next) => {
@@ -79,6 +80,24 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log = c
     ].join('; '));
     c.header('Cache-Control', 'no-cache');
     return c.html(html);
+  });
+
+  // Adressuggesties (PDOK via onze server, zodat de pagina alleen met zichzelf praat)
+  app.get('/api/adres/suggest', async (c) => {
+    if (!adres) return c.json({ ok: true, items: [] });
+    if (!adresLimiter.allow(clientIp(c, cfg.trustProxy))) return c.json({ ok: false, items: [] }, 429);
+    const q = (c.req.query('q') || '').trim().slice(0, 100);
+    if (q.length < 3) return c.json({ ok: true, items: [] });
+    c.header('Cache-Control', 'private, max-age=300');
+    return c.json({ ok: true, items: await adres.suggest(q) });
+  });
+  app.get('/api/adres/lookup', async (c) => {
+    if (!adres) return c.json({ ok: false }, 404);
+    if (!adresLimiter.allow(clientIp(c, cfg.trustProxy))) return c.json({ ok: false }, 429);
+    const id = c.req.query('id') || '';
+    if (!/^adr-[a-z0-9]{1,40}$/.test(id)) return c.json({ ok: false }, 400);
+    const a = await adres.lookup(id);
+    return a ? c.json({ ok: true, adres: a }) : c.json({ ok: false }, 404);
   });
 
   app.post('/api/aanvraag', bodyLimit({ maxSize: 64 * 1024, onError: (c) => c.json({ ok: false, fout: 'De aanvraag is te groot.' }, 413) }), async (c) => {

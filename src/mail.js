@@ -22,6 +22,7 @@ export function velden(rij) {
   r.push(['Telefoon', rij.telefoon]);
   r.push(['E-mail', rij.email]);
   r.push(['Adres project', rij.adres]);
+  if (rij.adres_gemeente) r.push(['Gemeente', rij.adres_gemeente]);
   if (rij.projecten_stil != null) r.push(['Projecten stil', String(rij.projecten_stil)]);
   if (rij.korte_termijn) r.push(['Korte termijn nodig', rij.korte_termijn]);
   r.push(['Bouwmelding DSO', of(rij.dso, JNW) + (rij.dso_datum ? ' (' + String(rij.dso_datum).slice(0, 10) + ')' : '')]);

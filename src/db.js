@@ -13,6 +13,12 @@ CREATE TABLE IF NOT EXISTS aanvragen (
   telefoon                text NOT NULL,
   email                   text NOT NULL,
   adres                   text NOT NULL,
+  adres_bag_id            text,
+  adres_straat            text,
+  adres_huisnummer        text,
+  adres_postcode          text,
+  adres_plaats            text,
+  adres_gemeente          text,
   projecten_stil          integer,
   korte_termijn           text,
   dso                     text NOT NULL,
@@ -41,12 +47,19 @@ CREATE TABLE IF NOT EXISTS aanvragen (
   bevestiging_pogingen    integer NOT NULL DEFAULT 0,
   bevestiging_fout        text
 );
+ALTER TABLE aanvragen
+  ADD COLUMN IF NOT EXISTS adres_bag_id text,
+  ADD COLUMN IF NOT EXISTS adres_straat text,
+  ADD COLUMN IF NOT EXISTS adres_huisnummer text,
+  ADD COLUMN IF NOT EXISTS adres_postcode text,
+  ADD COLUMN IF NOT EXISTS adres_plaats text,
+  ADD COLUMN IF NOT EXISTS adres_gemeente text;
 CREATE INDEX IF NOT EXISTS aanvragen_aangemaakt_idx ON aanvragen (aangemaakt_op DESC);
 CREATE INDEX IF NOT EXISTS aanvragen_mail_open_idx ON aanvragen (id) WHERE mail_verzonden_op IS NULL OR bevestiging_verzonden_op IS NULL;
 `;
 
 const KOLOMMEN = [
-  'ref', 'triage', 'rol', 'naam', 'bedrijf', 'telefoon', 'email', 'adres', 'projecten_stil', 'korte_termijn', 'dso', 'dso_datum',
+  'ref', 'triage', 'rol', 'naam', 'bedrijf', 'telefoon', 'email', 'adres', 'adres_bag_id', 'adres_straat', 'adres_huisnummer', 'adres_postcode', 'adres_plaats', 'adres_gemeente', 'projecten_stil', 'korte_termijn', 'dso', 'dso_datum',
   'vergunning', 'vorige_borger', 'vorige_borger_anders', 'gemeente_contact', 'bouwwerk_type', 'fase', 'fase_label', 'fundering_beton',
   'verdieping_beton', 'wanneer', 'rapportages', 'borgingsplan', 'toelichting', 'bron', 'ip', 'user_agent', 'ruw',
 ];
@@ -57,6 +70,7 @@ const leeg = (v) => (v === '' || v === undefined ? null : v);
 export function naarRij(d, extra) {
   return {
     ref: extra.ref, triage: extra.triage, rol: d.rol, naam: d.naam, bedrijf: leeg(d.bedrijf), telefoon: d.telefoon, email: d.email, adres: d.adres,
+    adres_bag_id: leeg(d.adres_id), adres_straat: leeg(d.adres_straat), adres_huisnummer: leeg(d.adres_huisnummer), adres_postcode: leeg(d.adres_postcode), adres_plaats: leeg(d.adres_plaats), adres_gemeente: leeg(d.adres_gemeente),
     projecten_stil: d.stil ? Number(d.stil) : null, korte_termijn: leeg(d.korte), dso: d.dso, dso_datum: leeg(d.dsodatum), vergunning: leeg(d.vergunning),
     vorige_borger: leeg(d.borger), vorige_borger_anders: leeg(d.borgeranders), gemeente_contact: leeg(d.gemeente), bouwwerk_type: leeg(d.type),
     fase: Number(d.fase), fase_label: extra.faseLabel, fundering_beton: leeg(d.fundbeton), verdieping_beton: leeg(d.verdbeton), wanneer: leeg(d.wanneer),

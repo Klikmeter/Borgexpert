@@ -23,12 +23,21 @@ export function fakeMailer({ fail = false } = {}) {
 
 export const stilleLog = { info() {}, warn() {}, error() {} };
 
+export function fakeAdres() {
+  const ADRES = { id: 'adr-1a2b3c', label: 'Lindelaan 8, 7314AB Apeldoorn', straat: 'Lindelaan', huisnummer: '8', postcode: '7314AB', plaats: 'Apeldoorn', gemeente: 'Apeldoorn' };
+  return {
+    async suggest(q) { return /lind/i.test(q) ? [{ id: ADRES.id, label: ADRES.label }, { id: 'adr-9z9z9z', label: 'Lindelaan 10, 7314AB Apeldoorn' }] : []; },
+    async lookup(id) { return id === ADRES.id ? ADRES : null; },
+  };
+}
+
 export function maakApp(over = {}) {
   const cfg = loadConfig({ APP_URL: 'https://www.borgexpert.online', RATE_LIMIT_MAX: '3', ...over.env });
   const db = over.db || fakeDb();
   const mailer = over.mailer || fakeMailer();
   const verifyTurnstile = over.verifyTurnstile || (async () => true);
-  const app = createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log: stilleLog });
+  const adres = 'adres' in over ? over.adres : fakeAdres();
+  const app = createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, log: stilleLog });
   return { app, db, mailer, cfg };
 }
 

@@ -4,6 +4,7 @@ import { loadConfig } from './config.js';
 import { createPool, createDb } from './db.js';
 import { createResendMailer } from './mail.js';
 import { createApp, createTurnstileVerifier, verstuurMails } from './app.js';
+import { createAdresClient } from './adres.js';
 
 const cfg = loadConfig();
 const log = console;
@@ -23,7 +24,8 @@ log.info('[db] schema gecontroleerd');
 const mailer = createResendMailer({ apiKey: cfg.resendApiKey, apiUrl: cfg.resendApiUrl, log });
 const verifyTurnstile = createTurnstileVerifier(cfg.turnstileSecretKey);
 const indexHtml = readFileSync(new URL('../public/index.html', import.meta.url), 'utf8');
-const app = createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log });
+const adres = createAdresClient({ log });
+const app = createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, log });
 
 // Retry-lus: mails die niet weg konden (Resend down, key ontbrak) alsnog versturen.
 async function verwerkOnverzonden() {

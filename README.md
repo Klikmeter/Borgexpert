@@ -13,6 +13,7 @@ src/validate.js     server-side validatie (zod), zelfde regels als de pagina
 src/triage.js       triage en fase-label, zelfde logica als de pagina
 src/db.js           schema + queries (tabel aanvragen)
 src/mail.js         interne mail, bevestigingsmail, Resend-client
+src/adres.js        adressuggesties via PDOK Locatieserver (BAG), via /api/adres/*
 test/               node:test, draait zonder database (`npm test`)
 ```
 

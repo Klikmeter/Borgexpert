@@ -201,6 +201,11 @@ section.alt{background:var(--white)}
 .upload b{color:var(--blue);font-weight:600}
 .files{list-style:none;padding:0;margin:8px 0 0;font-size:14px;color:var(--ink)}
 .nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:34px;padding-top:26px;border-top:1px solid var(--line-soft)}
+.combo{position:relative}
+.suggest{list-style:none;margin:0;padding:6px 0;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 32px rgba(20,30,60,.12);max-height:280px;overflow:auto}
+.suggest li{padding:11px 16px;font-size:15.5px;line-height:1.4;cursor:pointer;color:var(--ink)}
+.suggest li[aria-selected="true"],.suggest li:hover{background:var(--blue-tint);color:var(--blue-deep)}
+.suggest li b{font-weight:600}
 .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
 .formerr{margin-top:14px;padding:12px 14px;border-radius:8px;background:#FDECEC;color:#8A1C1C;font-size:14.5px;line-height:1.5}
 .cf-turnstile{margin-top:18px}
@@ -331,7 +336,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
               <div class="field" data-key="telefoon"><label for="telefoon">Telefoonnummer</label><input id="telefoon" name="telefoon" type="tel" inputmode="tel" autocomplete="tel"><span class="msg">Vul een telefoonnummer in, dan kunnen we je terugbellen.</span></div>
               <div class="field" data-key="email"><label for="email">E-mailadres</label><input id="email" name="email" type="email" inputmode="email" autocomplete="email"><span class="msg">Vul een geldig e-mailadres in.</span></div>
             </div>
-            <div class="field" data-key="adres"><label for="adres">Adres van het bouwproject</label><input id="adres" name="adres" type="text" placeholder="Straat, huisnummer en plaats" autocomplete="off"><span class="msg">Vul het adres van het project in.</span></div>
+            <div class="field" data-key="adres"><label for="adres">Adres van het bouwproject</label><div class="combo"><input id="adres" name="adres" type="text" placeholder="Straat, huisnummer en plaats" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="adres-list" aria-haspopup="listbox"><ul class="suggest" id="adres-list" role="listbox" hidden></ul></div><input type="hidden" name="adres_id"><input type="hidden" name="adres_straat"><input type="hidden" name="adres_huisnummer"><input type="hidden" name="adres_postcode"><input type="hidden" name="adres_plaats"><input type="hidden" name="adres_gemeente"><span class="msg">Vul het adres van het project in.</span></div>
             <div class="only" id="aannemer-only">
               <div class="two">
                 <div class="field" data-key="stil"><label for="stil">Hoeveel projecten liggen nu stil?</label><input id="stil" name="stil" type="number" min="1" inputmode="numeric" placeholder="bijv. 3"></div>
@@ -609,6 +614,60 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   refreshConditional();
   frm.addEventListener('change', () => { refreshConditional(); save(); });
   frm.addEventListener('input', e => { e.target.closest('.field')?.classList.remove('err'); });
+
+  // ---- adressuggesties (PDOK via onze server)
+  (() => {
+    const inp = $('#adres'), list = $('#adres-list');
+    const detail = ['adres_id', 'adres_straat', 'adres_huisnummer', 'adres_postcode', 'adres_plaats', 'adres_gemeente'];
+    const setDetail = a => detail.forEach(k => { frm.elements[k].value = a ? (a[k.replace('adres_', '')] || '') : ''; });
+    let items = [], cur = -1, timer = null, ctrl = null, laatste = '';
+    const sluit = () => { list.hidden = true; list.innerHTML = ''; items = []; cur = -1; inp.setAttribute('aria-expanded', 'false'); };
+    const markeer = (label, q) => {
+      const s = esc(label);
+      const w = q.split(/\s+/).filter(x => x.length > 1).map(x => x.replace(/[.*+?^{}$()|[\]\\]/g, '\\$&'));
+      return w.length ? s.replace(new RegExp('(' + w.join('|') + ')', 'ig'), '<b>$1</b>') : s;
+    };
+    const toon = () => {
+      if (!items.length) return sluit();
+      const q = inp.value.trim();
+      list.innerHTML = items.map((it, i) => '<li role="option" id="adres-opt-' + i + '" aria-selected="' + (i === cur) + '">' + markeer(it.label, q) + '</li>').join('');
+      list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    };
+    const kies = async i => {
+      const it = items[i]; if (!it) return;
+      inp.value = it.label; laatste = it.label; sluit();
+      setDetail({ id: it.id });
+      try {
+        const r = await fetch('/api/adres/lookup?id=' + encodeURIComponent(it.id));
+        const j = await r.json();
+        if (j.ok) { setDetail(j.adres); if (j.adres.label) { inp.value = j.adres.label; laatste = j.adres.label; } }
+      } catch (e) {}
+      save();
+    };
+    inp.addEventListener('input', () => {
+      if (inp.value !== laatste) setDetail(null);
+      clearTimeout(timer);
+      const q = inp.value.trim();
+      if (q.length < 3) return sluit();
+      timer = setTimeout(async () => {
+        if (ctrl) ctrl.abort();
+        ctrl = new AbortController();
+        try {
+          const r = await fetch('/api/adres/suggest?q=' + encodeURIComponent(q), { signal: ctrl.signal });
+          const j = await r.json(); items = j.items || []; cur = -1; toon();
+        } catch (e) { if (e.name !== 'AbortError') sluit(); }
+      }, 180);
+    });
+    inp.addEventListener('keydown', e => {
+      if (list.hidden) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); cur = (cur + 1) % items.length; toon(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); cur = (cur - 1 + items.length) % items.length; toon(); }
+      else if (e.key === 'Enter') { if (cur >= 0) { e.preventDefault(); kies(cur); } }
+      else if (e.key === 'Escape') sluit();
+    });
+    list.addEventListener('mousedown', e => { e.preventDefault(); const li = e.target.closest('li'); if (li) kies(+li.id.split('-').pop()); });
+    inp.addEventListener('blur', () => setTimeout(sluit, 150));
+  })();
 
 
   // ---- steps
