@@ -9,6 +9,10 @@ const cfg = loadConfig();
 const log = console;
 
 if (!cfg.databaseUrl) { log.error('DATABASE_URL ontbreekt. Koppel de Postgres-service in Railway (Variables > Add reference).'); process.exit(1); }
+if (!/^postgres(ql)?:\/\//.test(cfg.databaseUrl)) {
+  log.error(`DATABASE_URL is geen database-adres maar de tekst "${cfg.databaseUrl.slice(0, 40)}". Railway heeft de reference niet ingevuld: bestaat de Postgres-service en heet die zo? Voeg de variabele opnieuw toe via het {}-icoontje (Add Reference).`);
+  process.exit(1);
+}
 if (!cfg.resendApiKey) log.warn('RESEND_API_KEY ontbreekt: aanvragen worden opgeslagen maar nog niet gemaild. Ze gaan alsnog weg zodra de key is gezet.');
 if (!cfg.turnstileSecretKey) log.warn('TURNSTILE_SECRET_KEY ontbreekt: alleen honeypot en rate limit beschermen tegen bots.');
 
