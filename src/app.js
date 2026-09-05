@@ -26,11 +26,11 @@ export function clientIp(c, trustProxy) {
 /** Verstuurt beide mails voor een rij en werkt de status bij. Fouten worden geregistreerd, nooit gegooid. */
 export async function verstuurMails(rij, { db, mailer, cfg, log }) {
   if (!rij.mail_verzonden_op) {
-    try { await mailer.send(interneMail(rij, cfg)); await db.markeerMail(rij.id, { verzonden: true }); rij.mail_verzonden_op = new Date(); }
+    try { const m = interneMail(rij, cfg); m.idempotencyKey += '-p' + (rij.mail_pogingen || 0); await mailer.send(m); await db.markeerMail(rij.id, { verzonden: true }); rij.mail_verzonden_op = new Date(); }
     catch (e) { log.error(`[mail] intern ${rij.ref} mislukt: ${e.message}`); await db.markeerMail(rij.id, { verzonden: false, fout: e.message }); }
   }
   if (cfg.confirmationEmail && !rij.bevestiging_verzonden_op) {
-    try { await mailer.send(bevestigingsMail(rij, cfg)); await db.markeerBevestiging(rij.id, { verzonden: true }); rij.bevestiging_verzonden_op = new Date(); }
+    try { const m = bevestigingsMail(rij, cfg); m.idempotencyKey += '-p' + (rij.bevestiging_pogingen || 0); await mailer.send(m); await db.markeerBevestiging(rij.id, { verzonden: true }); rij.bevestiging_verzonden_op = new Date(); }
     catch (e) { log.error(`[mail] bevestiging ${rij.ref} mislukt: ${e.message}`); await db.markeerBevestiging(rij.id, { verzonden: false, fout: e.message }); }
   }
 }

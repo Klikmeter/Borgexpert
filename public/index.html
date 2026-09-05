@@ -83,7 +83,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 .hero-text{padding:0 0 48px;max-width:760px}
 .hero h1{font-size:clamp(32px,4.2vw,52px);color:#fff;margin:18px auto 0;max-width:18ch}
 .hero .lede{color:rgba(255,255,255,.88);margin:20px auto 0;font-size:17px;max-width:56ch}
-.promise-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 40px;margin-top:32px}
+.gbadge{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:9px 16px 9px 13px;border-radius:999px;background:#fff;color:var(--ink);text-decoration:none;font-size:14px;font-weight:600;box-shadow:0 6px 20px rgba(10,30,90,.18);transition:transform .15s,box-shadow .15s}
+.gbadge:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(10,30,90,.24)}
+.gbadge .stars{display:inline-flex;gap:2px}
+.gbadge .stars svg{width:16px;height:16px;fill:#FBBC04}
+.gbadge b{font-weight:700;font-size:15px}
+.gbadge .txt{color:var(--muted);font-weight:500}
+.gbadge .cnt{color:var(--blue);border-left:1px solid var(--line);padding-left:10px}
+.promise-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 40px;margin-top:28px}
 .promise-row div{display:flex;align-items:baseline;gap:10px}
 .promise-row .num{font-family:var(--slab);font-size:30px;font-weight:600;line-height:1;color:#fff;font-variant-numeric:tabular-nums}
 .promise-row .lbl{font-weight:600;font-size:14px;color:rgba(255,255,255,.9);line-height:1.2}
@@ -127,7 +134,7 @@ section.alt{background:var(--white)}
 .hours{display:grid;grid-template-columns:auto 1fr;column-gap:18px;row-gap:6px;margin:0 0 18px;color:var(--text);font-size:15.5px}
 .hours dt{color:var(--muted)}
 .hours dd{margin:0}
-.contact .hint{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:22px}
+.hours{margin-bottom:24px}
 .lines{list-style:none;margin:0;padding:0;display:grid;gap:12px}
 .lines li{display:flex;align-items:center;gap:10px;font-size:16px}
 .lines svg{width:18px;height:18px;color:var(--blue);flex:none}
@@ -235,6 +242,14 @@ section.alt{background:var(--white)}
 .plan-foot h4{font-size:15px;margin-bottom:8px}
 .plan-foot p,.plan-foot li{font-size:14.5px;color:var(--text);line-height:1.6}
 .plan-foot ul{margin:0;padding-left:18px}
+.done{display:flex;gap:16px;align-items:flex-start;background:#EAF7EE;border-radius:12px;padding:20px 22px;margin-bottom:28px}
+.done svg{width:36px;height:36px;flex:none;padding:7px;border-radius:50%;background:var(--ok);color:#fff}
+.done h3{font-size:20px;margin:2px 0 4px}
+.done p{color:var(--text);font-size:15px;line-height:1.55}
+.plan-nav{border:0;padding-top:20px;flex-wrap:wrap;justify-content:flex-end}
+.plan-nav .btn.quiet{order:2;flex-basis:100%;justify-content:flex-start;padding-inline:0;margin-top:6px}
+.plan-nav .btn.outline{padding-inline:22px;letter-spacing:1.5px}
+body.plan-open .stickybar{display:none}
 .ref{font-family:var(--slab);font-size:14px;color:var(--muted);margin-top:26px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
 /* ---------- footer ---------- */
@@ -252,6 +267,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   .stepper span{font-size:11px;letter-spacing:1px}
   .hero-text{padding:0 0 28px}
   .promise-row{display:none}
+  .gbadge{margin-top:18px;font-size:13px;padding:8px 14px 8px 12px}
   .hero .lede{margin-top:12px;font-size:16px}
   :root{--overlap:260px}
   .always{grid-template-columns:1fr;padding:28px 24px;gap:24px}
@@ -274,6 +290,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   .two,.tiles.cols-2,.tiles.cols-3{grid-template-columns:1fr}
   .hero .cta .btn{width:100%;justify-content:center}
   .nav{flex-direction:column-reverse;align-items:stretch}
+  .plan-nav .btn.quiet{justify-content:center}
   .nav .btn{justify-content:center}
   .stickybar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-top:1px solid var(--line);padding:10px 14px;gap:10px;box-shadow:0 -8px 24px rgba(0,0,0,.06)}
   .stickybar a{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:var(--radius);font-weight:600;font-size:14px;text-decoration:none;letter-spacing:1px}
@@ -297,6 +314,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
       <div class="hero-text">
         <h1>Je bouw ligt stil. Wij zorgen dat je weer verder kunt.</h1>
         <p class="lede">Vertel ons waar je project staat. Je ziet direct de eerstvolgende stappen en binnen één werkdag belt een kwaliteitsborger je met een concreet plan.</p>
+        <a class="gbadge" href="https://www.google.com/maps/search/?api=1&query=Borg+Expert+B.V.+Brouwerijstraat+1+Enschede" target="_blank" rel="noopener" aria-label="Bekijk onze Google-reviews: 5,0 uit 21 reviews"><span class="stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z"/></svg></span><b>5,0</b><span class="txt">op Google</span><span class="cnt">21 reviews</span></a>
         <div class="promise-row" aria-label="Wat je van ons kunt verwachten">
           <div><span class="num">3</span><span class="lbl">minuten invullen</span></div>
           <div><span class="num">1</span><span class="lbl">werkdag tot een plan</span></div>
@@ -446,6 +464,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
 
         <!-- PLAN -->
         <div class="card" id="plan" aria-live="polite">
+          <div class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><div><h3>Bedankt voor je aanvraag</h3><p id="done-text"></p></div></div>
           <div class="plan-head"><div><p class="eyebrow">Jouw plan van aanpak</p><h3 id="plan-title" style="margin-top:8px"></h3></div><span class="pill" id="plan-pill"></span></div>
           <div class="situ" id="situ"></div>
           <p class="verdict" id="verdict"></p>
@@ -455,7 +474,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
             <div class="box"><h4>Wat je nu al kunt doen</h4><ul id="now"></ul></div>
           </div>
           <div class="ref"><span id="ref"></span><span id="mailnote"></span></div>
-          <div class="nav" style="border:0;padding-top:20px"><button type="button" class="btn quiet" id="again">Nog een project aanmelden</button><a class="btn outline" href="tel:+31857607278">Bel ons direct</a><a class="btn outline" id="wa" href="https://wa.me/31686800095" target="_blank" rel="noopener">Stuur een WhatsApp</a></div>
+          <div class="nav plan-nav"><button type="button" class="btn quiet" id="again">Nog een project aanmelden</button><a class="btn outline" href="tel:+31857607278">Bel ons direct</a><a class="btn outline" id="wa" href="https://wa.me/31686800095" target="_blank" rel="noopener">Stuur een WhatsApp</a></div>
         </div>
       </div>
       </div>
@@ -536,7 +555,6 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
         <dt>Vrijdag</dt><dd>08:30 tot 17:00 uur</dd>
         <dt>Zaterdag en zondag</dt><dd>Gesloten</dd>
       </dl>
-      <p class="hint">Bij een bouwstop zijn we ook buiten kantoortijd bereikbaar via WhatsApp.</p>
       <ul class="lines">
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><a href="tel:+31857607278">(085) 760 72 78</a></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M9.5 9.5c0 3 2 5 5 5l1-1.5-2-1-1 1a4 4 0 0 1-1.5-1.5l1-1-1-2z"/></svg><a href="https://wa.me/31686800095" target="_blank" rel="noopener">06 86 80 00 95 (WhatsApp)</a></li>
@@ -628,7 +646,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
       return w.length ? s.replace(new RegExp('(' + w.join('|') + ')', 'ig'), '<b>$1</b>') : s;
     };
     const toon = () => {
-      if (!items.length) return sluit();
+      if (!items.length || document.activeElement !== inp) return sluit();
       const q = inp.value.trim();
       list.innerHTML = items.map((it, i) => '<li role="option" id="adres-opt-' + i + '" aria-selected="' + (i === cur) + '">' + markeer(it.label, q) + '</li>').join('');
       list.hidden = false; inp.setAttribute('aria-expanded', 'true');
@@ -761,7 +779,9 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     $('#need').innerHTML = plan.need.map(s => `<li>${esc(s)}</li>`).join('');
     $('#now').innerHTML = plan.now.map(s => `<li>${esc(s)}</li>`).join('');
     $('#ref').textContent = 'Referentie ' + ref;
+    $('#done-text').textContent = 'Je aanvraag is verstuurd. Je ontvangt van ons een bevestigingsmail op ' + (d.email || 'je e-mailadres') + ', en uiterlijk ' + nextWorkday() + ' belt een kwaliteitsborger je.';
     frm.style.display = 'none';
+    document.body.classList.add('plan-open');
     $('#plan').classList.add('on');
     $('#plan').scrollIntoView({behavior: 'smooth', block: 'start'});
   }
@@ -791,7 +811,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
       if (window.turnstile && ts) { try { window.turnstile.reset(); } catch (e3) {} }
     } finally { btn.disabled = false; }
   });
-  $('#again').addEventListener('click', () => { frm.reset(); refreshConditional(); $('#plan').classList.remove('on'); frm.style.display = ''; show(1); });
+  $('#again').addEventListener('click', () => { frm.reset(); refreshConditional(); $('#plan').classList.remove('on'); document.body.classList.remove('plan-open'); frm.style.display = ''; show(1); });
 
   // resume at saved step
   try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.step > 1 && !prefilled) show(s.step); } catch (e) {}
