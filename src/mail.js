@@ -68,8 +68,7 @@ ${cfg.phone} · ${cfg.whatsapp} · www.borgexpert.nl`;
 <p>Beste ${esc(rij.naam)},</p>
 <p>We hebben uw aanvraag voor <strong>${esc(rij.adres)}</strong> ontvangen en nemen zo snel mogelijk contact met u op.</p>
 <p>Uw referentie: <strong>${esc(rij.ref)}</strong></p>
-<p><strong>Spoed?</strong> Neem dan telefonisch contact met ons op via <a href="${cfg.phoneHref}" style="color:#1D54E9">${esc(cfg.phone)}</a>, of stuur ons een WhatsApp-bericht.</p>
-<table cellpadding="0" cellspacing="0" style="margin:18px 0"><tr><td style="background:#25D366;border-radius:8px"><a href="${esc(wa)}" style="display:inline-block;padding:13px 22px;color:#fff;font-weight:bold;text-decoration:none;font-size:15px">WhatsApp: ${esc(cfg.whatsapp)}</a></td></tr></table>
+<p><strong>Spoed?</strong> Neem dan telefonisch contact met ons op via <a href="${cfg.phoneHref}" style="color:#1D54E9">${esc(cfg.phone)}</a>, of stuur ons een <a href="${esc(wa)}" style="color:#1D54E9">WhatsApp-bericht</a> naar ${esc(cfg.whatsapp)}.</p>
 <p>Met vriendelijke groet,<br>Borg Expert<br><span style="color:#666;font-size:13px">${esc(cfg.phone)} · ${esc(cfg.whatsapp)} · <a href="https://www.borgexpert.nl" style="color:#1D54E9">www.borgexpert.nl</a></span></p>
 </div>`;
   return { from: cfg.emailFrom, to: [rij.email], reply_to: cfg.emailTo, subject, text, html, idempotencyKey: `bevestiging-${rij.ref}` };

@@ -33,7 +33,8 @@ test('bevestigingsmail: naar de aanvrager, met referentie, telefoon en WhatsApp-
   assert.match(m.text, /Spoed\? Neem dan telefonisch contact/);
   assert.match(m.text, /\(085\) 760 72 78/);
   assert.match(m.html, /https:\/\/wa\.me\/31686800095\?text=/);
-  assert.match(m.html, /WhatsApp: 06 86 80 00 95/);
+  assert.match(m.html, /WhatsApp-bericht<\/a> naar 06 86 80 00 95/);
+  assert.ok(!m.html.includes('#25D366'), 'geen groene knop meer');
   assert.match(m.html, /BE-2609-ABCDE/);
 });
 
