@@ -250,7 +250,9 @@ section.alt{background:var(--white)}
 .plan-nav .btn.quiet{order:2;flex-basis:100%;justify-content:flex-start;padding-inline:0;margin-top:6px}
 .plan-nav .btn.outline{padding-inline:22px;letter-spacing:1.5px}
 body.plan-open .stickybar{display:none}
-.ref{font-family:var(--slab);font-size:14px;color:var(--muted);margin-top:26px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ref{margin-top:30px;display:grid;gap:8px}
+.ref strong{font-size:20px;line-height:1.35;color:var(--ink);font-weight:600}
+.ref span{font-family:var(--slab);font-size:14px;color:var(--muted)}
 
 /* ---------- footer ---------- */
 footer{background:var(--ink);color:rgba(255,255,255,.8);padding:56px 0 40px;font-size:14.5px}
@@ -474,7 +476,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
             <div class="box"><h4>Wat wij van jou nodig hebben</h4><ul id="need"></ul></div>
             <div class="box"><h4>Wat je nu al kunt doen</h4><ul id="now"></ul></div>
           </div>
-          <div class="ref"><span id="ref"></span><span id="mailnote"></span></div>
+          <div class="ref"><strong id="mailnote"></strong><span id="ref"></span></div>
           <div class="nav plan-nav"><button type="button" class="btn quiet" id="again">Nog een project aanmelden</button><a class="btn outline" href="tel:+31857607278">Bel ons direct</a><a class="btn outline" id="wa" href="https://wa.me/31686800095" target="_blank" rel="noopener">Stuur een WhatsApp</a></div>
         </div>
       </div>
@@ -729,7 +731,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     const d = new Date(); d.setHours(17,0,0,0);
     if (new Date().getHours() >= 12) d.setDate(d.getDate() + 1);
     while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
-    return d.toLocaleDateString('nl-NL', {weekday: 'long', day: 'numeric', month: 'long'}) + ' om 17:00';
+    return d.toLocaleDateString('nl-NL', {weekday: 'long', day: 'numeric', month: 'long'}) + ' voor 17:00';
   }
   function buildPlan(d) {
     const t = triage(d), f = +d.fase, first = (d.naam || '').split(' ')[0];
