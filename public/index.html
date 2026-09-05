@@ -431,7 +431,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
                 <div class="tiles"><label class="tile"><input type="radio" name="plan" value="ja"><span class="dot"></span>Ja</label><label class="tile"><input type="radio" name="plan" value="nee"><span class="dot"></span>Nee</label><label class="tile"><input type="radio" name="plan" value="weet"><span class="dot"></span>Weet ik niet</label></div>
               </div>
             </div>
-            <div class="field" data-key="toelichting"><label for="toelichting">Toelichting <span class="opt">wat moeten wij verder weten?</span></label><textarea id="toelichting" name="toelichting" maxlength="4000" placeholder="Bijvoorbeeld: welke afspraken er met de gemeente zijn, wanneer de aannemer beschikbaar is, of wat je zorgen zijn."></textarea><p class="hint" style="margin:6px 0 0">Rapportages, foto's of het borgingsplan kun je na je aanvraag nasturen via WhatsApp of als antwoord op onze bevestigingsmail.</p></div>
+            <div class="field" data-key="toelichting"><label for="toelichting">Toelichting <span class="opt">wat moeten wij verder weten?</span></label><textarea id="toelichting" name="toelichting" maxlength="4000" placeholder="Bijvoorbeeld: welke afspraken er met de gemeente zijn, wanneer de aannemer beschikbaar is, of wat je zorgen zijn."></textarea></div>
             __TURNSTILE_WIDGET__
             <p class="formerr" id="formerr" role="alert" hidden></p>
             <div class="nav"><button type="button" class="btn quiet" data-prev>← Terug</button><button type="submit" class="btn" id="submit">Toon mijn plan van aanpak <svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -679,7 +679,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     steps.push({when: 'Daarna', h: 'Nulmeting op locatie', p: f >= 7 ? 'We komen langs, leggen de staat van het werk vast en maken het dossier compleet tot en met de gereedmelding.' : 'We komen langs, leggen de huidige staat vast als vertrekpunt van het dossier en spreken de volgende controlemomenten af. Daarna kan de bouw weer verder.'});
     const need = [];
     if (d.rapport !== 'ja') need.push('Alles wat je hebt van de vorige borger: rapportages, foto\'s, mails');
-    else need.push('De rapportages en foto\'s van je vorige borger (mag als reactie op onze mail)');
+    else need.push('De rapportages en foto\'s van je vorige borger');
     if (d.plan !== 'ja') need.push('Het borgingsplan en de risicobeoordeling, als je die kunt vinden');
     if (d.dso === 'ja') need.push('De bevestiging van de bouwmelding uit het Omgevingsloket');
     need.push('De contactgegevens van je ' + (d.rol === 'particulier' ? 'aannemer' : 'opdrachtgever'));
