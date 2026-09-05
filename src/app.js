@@ -60,6 +60,8 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log = c
 
   app.use('/fonts/*', async (c, next) => { await next(); if (c.res.status === 200) c.res.headers.set('Cache-Control', 'public, max-age=31536000, immutable'); });
   app.use('/fonts/*', serveStatic({ root: './public' }));
+  app.use('/img/*', async (c, next) => { await next(); if (c.res.status === 200) c.res.headers.set('Cache-Control', 'public, max-age=86400'); });
+  app.use('/img/*', serveStatic({ root: './public' }));
   app.get('/favicon.svg', serveStatic({ path: './public/favicon.svg' }));
   app.get('/favicon.ico', (c) => c.body(null, 204));
 
@@ -68,6 +70,7 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log = c
     const ts = cfg.turnstileSiteKey;
     const html = indexHtml
       .replaceAll('__CSP_NONCE__', nonce)
+      .replaceAll('__APP_URL__', cfg.appUrl)
       .replaceAll('__TURNSTILE_SCRIPT__', ts ? `<script nonce="${nonce}" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : '')
       .replaceAll('__TURNSTILE_WIDGET__', ts ? `<div class="cf-turnstile" data-sitekey="${esc(ts)}" data-language="nl" data-size="flexible"></div>` : '');
     c.header('Content-Security-Policy', [

@@ -17,6 +17,10 @@ test('pagina: nonce in CSP en script, fonts lokaal, geen Turnstile zonder siteke
   assert.ok(html.includes('/fonts/fonts.css'));
   assert.ok(html.includes('name="website"'), 'honeypot aanwezig');
   assert.ok(html.includes('wa.me/31686800095'));
+  assert.ok(html.includes('content="https://www.borgexpert.online/img/og-image.png"'), 'og:image absoluut');
+  assert.ok(!html.includes('__APP_URL__'));
+  assert.equal((await app.request('https://www.borgexpert.online/img/og-image.png')).status, 200);
+  assert.equal((await app.request('https://www.borgexpert.online/img/apple-touch-icon.png')).status, 200);
   assert.ok(!html.includes('wa.me/31857607278'));
   assert.equal(r.headers.get('strict-transport-security'), 'max-age=31536000; includeSubDomains');
 });
