@@ -59,17 +59,17 @@ We hebben uw aanvraag voor ${rij.adres} ontvangen en nemen zo snel mogelijk cont
 
 Uw referentie: ${rij.ref}
 
-Spoed? Neem dan telefonisch contact met ons op via ${cfg.phone}, of stuur een WhatsApp-bericht naar ${cfg.whatsapp}: ${wa}
+Spoed? Neem dan telefonisch contact met ons op via ${cfg.phone}, of stuur een WhatsApp-bericht: ${wa}
 
 Met vriendelijke groet,
 Borg Expert
-${cfg.phone} · ${cfg.whatsapp} · www.borgexpert.nl`;
+${cfg.phone} · www.borgexpert.nl`;
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#333;line-height:1.55;max-width:560px">
 <p>Beste ${esc(rij.naam)},</p>
 <p>We hebben uw aanvraag voor <strong>${esc(rij.adres)}</strong> ontvangen en nemen zo snel mogelijk contact met u op.</p>
 <p>Uw referentie: <strong>${esc(rij.ref)}</strong></p>
-<p><strong>Spoed?</strong> Neem dan telefonisch contact met ons op via <a href="${cfg.phoneHref}" style="color:#1D54E9">${esc(cfg.phone)}</a>, of stuur ons een <a href="${esc(wa)}" style="color:#1D54E9">WhatsApp-bericht</a> naar ${esc(cfg.whatsapp)}.</p>
-<p>Met vriendelijke groet,<br>Borg Expert<br><span style="color:#666;font-size:13px">${esc(cfg.phone)} · ${esc(cfg.whatsapp)} · <a href="https://www.borgexpert.nl" style="color:#1D54E9">www.borgexpert.nl</a></span></p>
+<p><strong>Spoed?</strong> Neem dan telefonisch contact met ons op via <a href="${cfg.phoneHref}" style="color:#1D54E9">${esc(cfg.phone)}</a>, of stuur ons een <a href="${esc(wa)}" style="color:#1D54E9">WhatsApp-bericht</a>.</p>
+<p>Met vriendelijke groet,<br>Borg Expert<br><span style="color:#666;font-size:13px">${esc(cfg.phone)} · <a href="https://www.borgexpert.nl" style="color:#1D54E9">www.borgexpert.nl</a></span></p>
 </div>`;
   return { from: cfg.emailFrom, to: [rij.email], reply_to: cfg.emailTo, subject, text, html, idempotencyKey: `bevestiging-${rij.ref}` };
 }
