@@ -91,6 +91,5 @@ Zonder Resend-key worden mails niet verstuurd maar wel gelogd als openstaand; de
 
 ## Nog aan te vullen op de pagina
 
-- TloKB-registratienummer (blauw gemarkeerd in "Hoe weet je dat wij niet de volgende zijn?").
 - De link "Privacyverklaring" onder het formulier wijst nu naar de homepage van borgexpert.nl.
 - `<meta name="robots" content="noindex">` staat aan. Weghalen als de pagina gevonden moet worden via Google.
