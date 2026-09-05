@@ -95,7 +95,7 @@ test('honeypot: doet alsof, slaat niets op', async () => {
 });
 
 test('turnstile mislukt: 400, niets opgeslagen', async () => {
-  const { app, db } = maakApp({ env: { TURNSTILE_SECRET_KEY: 's' }, verifyTurnstile: async () => false });
+  const { app, db } = maakApp({ env: { TURNSTILE_SITE_KEY: '1x', TURNSTILE_SECRET_KEY: 's' }, verifyTurnstile: async () => false });
   const r = await post(app, geldig());
   assert.equal(r.status, 400);
   assert.match((await r.json()).fout, /beveiligingscontrole/);
@@ -192,4 +192,12 @@ test('gekozen adres: losse kolommen in de database en gemeente in de mail', asyn
   await wacht();
   assert.match(mailer.sent[0].text, /Gemeente: Apeldoorn/);
   assert.equal((await post(app, { ...geldig(), adres_id: 'kwaad' })).status, 400);
+});
+
+test('turnstile met maar één sleutel: uitgeschakeld, aanvraag gaat gewoon door', async () => {
+  const { app, db } = maakApp({ env: { TURNSTILE_SECRET_KEY: 's' }, verifyTurnstile: async () => false });
+  const html = await (await app.request('https://www.borgexpert.online/')).text();
+  assert.ok(!html.includes('cf-turnstile'));
+  assert.equal((await post(app, geldig())).status, 200);
+  assert.equal(db.rows.length, 1);
 });

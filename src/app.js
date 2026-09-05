@@ -68,7 +68,7 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
 
   app.get('/', (c) => {
     const nonce = randomBytes(16).toString('base64');
-    const ts = cfg.turnstileSiteKey;
+    const ts = cfg.turnstileEnabled ? cfg.turnstileSiteKey : '';
     const html = indexHtml
       .replaceAll('__CSP_NONCE__', nonce)
       .replaceAll('__APP_URL__', cfg.appUrl)
@@ -117,8 +117,9 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
     // Honeypot: bots vullen het verborgen veld in. Doe alsof het gelukt is, sla niets op.
     if (d.website) { log.warn(`[spam] honeypot gevuld vanaf ${ip}`); return c.json({ ok: true, ref: nieuweRef(now()) }); }
 
-    if (cfg.turnstileSecretKey) {
+    if (cfg.turnstileEnabled) {
       const goed = await verifyTurnstile(d.turnstile, ip).catch((e) => { log.error('[turnstile] ' + e.message); return false; });
+      if (!goed) log.warn(`[turnstile] geweigerd vanaf ${ip} (token ${d.turnstile ? 'aanwezig' : 'ontbreekt'})`);
       if (!goed) return c.json({ ok: false, fout: 'De beveiligingscontrole is niet gelukt. Vernieuw de pagina en probeer het opnieuw.' }, 400);
     }
 
@@ -149,13 +150,14 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
 }
 
 /** Cloudflare Turnstile server-side check. */
-export function createTurnstileVerifier(secret, fetchImpl = fetch) {
+export function createTurnstileVerifier(secret, fetchImpl = fetch, log = console) {
   return async (token, ip) => {
     if (!token) return false;
     const form = new URLSearchParams({ secret, response: token });
     if (ip) form.set('remoteip', ip);
     const r = await fetchImpl('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form, signal: AbortSignal.timeout(10_000) });
     const j = await r.json();
+    if (j.success !== true) log.warn('[turnstile] siteverify: ' + JSON.stringify(j['error-codes'] || j));
     return j.success === true;
   };
 }

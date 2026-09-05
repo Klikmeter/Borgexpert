@@ -15,7 +15,9 @@ if (!/^postgres(ql)?:\/\//.test(cfg.databaseUrl)) {
   process.exit(1);
 }
 if (!cfg.resendApiKey) log.warn('RESEND_API_KEY ontbreekt: aanvragen worden opgeslagen maar nog niet gemaild. Ze gaan alsnog weg zodra de key is gezet.');
-if (!cfg.turnstileSecretKey) log.warn('TURNSTILE_SECRET_KEY ontbreekt: alleen honeypot en rate limit beschermen tegen bots.');
+if (cfg.turnstileEnabled) log.info('[turnstile] actief');
+else if (cfg.turnstileSiteKey || cfg.turnstileSecretKey) log.warn('Turnstile staat UIT: er is maar één van TURNSTILE_SITE_KEY en TURNSTILE_SECRET_KEY gezet. Zet beide (uit hetzelfde Cloudflare-widget) of haal beide weg.');
+else log.warn('Turnstile niet ingesteld: alleen honeypot en rate limit beschermen tegen bots.');
 
 const db = createDb(createPool(cfg.databaseUrl));
 await db.init();

@@ -19,6 +19,8 @@ export function loadConfig(env = process.env) {
     confirmationEmail: bool(env.CONFIRMATION_EMAIL, true),
     turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
     turnstileSecretKey: env.TURNSTILE_SECRET_KEY || '',
+    // Alleen actief als beide sleutels er zijn; met één sleutel zou elke aanvraag geweigerd worden.
+    turnstileEnabled: !!((env.TURNSTILE_SITE_KEY || '').trim() && (env.TURNSTILE_SECRET_KEY || '').trim()),
     rateLimitMax: Number(env.RATE_LIMIT_MAX || 5),
     rateLimitWindowMs: Number(env.RATE_LIMIT_WINDOW_MINUTES || 15) * 60_000,
     retryIntervalMs: Number(env.MAIL_RETRY_INTERVAL_MINUTES || 5) * 60_000,
