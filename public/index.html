@@ -77,7 +77,6 @@ button,input,select,textarea{font:inherit;color:inherit}
 .form-stage{position:relative;z-index:1;margin-top:calc(-1 * var(--overlap))}
 .form-stage .wrap{display:grid;justify-items:center}
 .hero-form{width:min(820px,100%);text-align:left}
-.hero-form .saved{margin:12px 4px 0;color:var(--muted);justify-content:center}
 .hero-side{width:min(820px,100%);display:flex;flex-wrap:wrap;justify-content:center;gap:6px 28px;margin:22px auto 56px;text-align:center}
 .hero-side p{font-size:14.5px;line-height:1.65;color:var(--text)}
 .hero-side strong{color:var(--ink);font-weight:600}
@@ -175,8 +174,6 @@ section.alt{background:var(--white)}
 .formerr{margin-top:14px;padding:12px 14px;border-radius:8px;background:#FDECEC;color:#8A1C1C;font-size:14.5px;line-height:1.5}
 .cf-turnstile{margin-top:18px}
 .consent{font-size:13px;color:var(--muted);line-height:1.5;margin-top:18px}
-.saved{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
-.saved i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block}
 
 /* ---------- plan ---------- */
 #plan{display:none}
@@ -424,7 +421,6 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
           <div class="nav" style="border:0;padding-top:20px"><button type="button" class="btn quiet" id="again">Nog een project aanmelden</button><a class="btn outline" href="tel:+31857607278">Bel ons direct</a><a class="btn outline" id="wa" href="https://wa.me/31686800095" target="_blank" rel="noopener">Stuur een WhatsApp</a></div>
         </div>
       </div>
-        <div class="saved" id="saved" hidden><i></i>Concept bewaard in je browser, je kunt later verder</div>
       </div>
   </div>
 </div>
@@ -529,7 +525,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     Object.entries(o).forEach(([k, v]) => { const el = frm.elements[k]; if (!el) return; if (el instanceof RadioNodeList) { el.value = v; } else if (el.type !== 'file') el.value = v; });
     refreshConditional();
   };
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify({step, data: state()})); $('#saved').hidden = false; } catch (e) {} };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify({step, data: state()})); } catch (e) {} };
 
   // ---- prefill from URL (persoonlijke links) + herkomst
   const params = new URLSearchParams(location.search);
