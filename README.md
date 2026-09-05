@@ -14,6 +14,7 @@ src/triage.js       triage en fase-label, zelfde logica als de pagina
 src/db.js           schema + queries (tabel aanvragen)
 src/mail.js         interne mail, bevestigingsmail, Resend-client
 src/adres.js        adressuggesties via PDOK Locatieserver (BAG), via /api/adres/*
+src/bijlagen.js     uploads (bouwmelding, omgevingsvergunning): PDF/JPG/PNG, max 10 MB per bestand, tabel bijlagen
 test/               node:test, draait zonder database (`npm test`)
 ```
 
@@ -21,8 +22,8 @@ test/               node:test, draait zonder database (`npm test`)
 
 1. De pagina valideert en stuurt JSON naar `POST /api/aanvraag`.
 2. De server controleert herkomst (Origin), rate limit per IP, honeypot, Turnstile en de invoer.
-3. De aanvraag wordt eerst in Postgres opgeslagen, met een referentie als `BE-2609-K7X2P`.
-4. Daarna gaan twee mails via Resend: naar de inbox (Reply-To is de aanvrager) en de bevestiging naar de aanvrager.
+3. De aanvraag wordt eerst in Postgres opgeslagen, met een referentie als `BE-2609-K7X2P`. Geüploade documenten (bevestiging bouwmelding, omgevingsvergunning) komen in de tabel `bijlagen`.
+4. Daarna gaan twee mails via Resend: naar de inbox (Reply-To is de aanvrager, met de documenten als bijlage) en de bevestiging naar de aanvrager.
 5. Mislukt een mail, dan staat de aanvraag er toch. Een retry-lus probeert het elke vijf minuten opnieuw (max. acht keer).
 
 ## Live zetten op Railway

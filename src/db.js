@@ -54,6 +54,17 @@ ALTER TABLE aanvragen
   ADD COLUMN IF NOT EXISTS adres_postcode text,
   ADD COLUMN IF NOT EXISTS adres_plaats text,
   ADD COLUMN IF NOT EXISTS adres_gemeente text;
+CREATE TABLE IF NOT EXISTS bijlagen (
+  id            bigserial PRIMARY KEY,
+  aanvraag_id   bigint NOT NULL REFERENCES aanvragen(id) ON DELETE CASCADE,
+  soort         text NOT NULL,
+  bestandsnaam  text NOT NULL,
+  mime          text NOT NULL,
+  grootte       integer NOT NULL,
+  inhoud        bytea NOT NULL,
+  aangemaakt_op timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS bijlagen_aanvraag_idx ON bijlagen (aanvraag_id);
 CREATE INDEX IF NOT EXISTS aanvragen_aangemaakt_idx ON aanvragen (aangemaakt_op DESC);
 CREATE INDEX IF NOT EXISTS aanvragen_mail_open_idx ON aanvragen (id) WHERE mail_verzonden_op IS NULL OR bevestiging_verzonden_op IS NULL;
 `;
@@ -83,11 +94,27 @@ export function createDb(pool) {
   return {
     async init() { await pool.query(SCHEMA); },
     /** Slaat een aanvraag op. Geeft de rij (met id) terug. */
-    async insert(rij) {
+    /** Slaat een aanvraag met eventuele bijlagen op in één transactie. Geeft de rij (met id) terug. */
+    async insert(rij, bijlagen = []) {
       const cols = KOLOMMEN.filter((k) => k in rij);
       const sql = `INSERT INTO aanvragen (${cols.join(',')}) VALUES (${cols.map((_, i) => '$' + (i + 1)).join(',')}) RETURNING *`;
-      const r = await pool.query(sql, cols.map((k) => rij[k]));
-      return r.rows[0];
+      if (!bijlagen.length) return (await pool.query(sql, cols.map((k) => rij[k]))).rows[0];
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        const r = await client.query(sql, cols.map((k) => rij[k]));
+        const a = r.rows[0];
+        for (const b of bijlagen) {
+          await client.query('INSERT INTO bijlagen (aanvraag_id, soort, bestandsnaam, mime, grootte, inhoud) VALUES ($1,$2,$3,$4,$5,$6)', [a.id, b.soort, b.bestandsnaam, b.mime, b.grootte, b.inhoud]);
+        }
+        await client.query('COMMIT');
+        return a;
+      } catch (e) { await client.query('ROLLBACK').catch(() => {}); throw e; } finally { client.release(); }
+    },
+    /** Bijlagen van een aanvraag, inclusief inhoud (voor de mail). */
+    async bijlagen(aanvraagId) {
+      const r = await pool.query('SELECT soort, bestandsnaam, mime, grootte, inhoud FROM bijlagen WHERE aanvraag_id = $1 ORDER BY id', [aanvraagId]);
+      return r.rows;
     },
     async refBestaat(ref) { const r = await pool.query('SELECT 1 FROM aanvragen WHERE ref = $1', [ref]); return r.rowCount > 0; },
     async markeerMail(id, { verzonden, fout }) {

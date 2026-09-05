@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { maakApp, geldig, post, wacht, fakeMailer, fakeDb, stilleLog } from './helpers.js';
+import { maakApp, geldig, post, postForm, wacht, fakeMailer, fakeDb, stilleLog, PDF, PNG } from './helpers.js';
 import { verstuurMails, nieuweRef } from '../src/app.js';
 
 test('pagina: nonce in CSP en script, fonts lokaal, geen Turnstile zonder sitekey', async () => {
@@ -151,7 +151,7 @@ test('canonieke redirect alleen als ingeschakeld, nooit voor /health', async () 
 
 test('te grote body: 413', async () => {
   const { app } = maakApp();
-  const r = await post(app, { ...geldig(), toelichting: 'a'.repeat(70_000) });
+  const r = await post(app, { ...geldig(), toelichting: 'a'.repeat(16 * 1024 * 1024) });
   assert.equal(r.status, 413);
 });
 
@@ -200,4 +200,50 @@ test('turnstile met maar één sleutel: uitgeschakeld, aanvraag gaat gewoon door
   assert.ok(!html.includes('class="cf-turnstile"'));
   assert.equal((await post(app, geldig())).status, 200);
   assert.equal(db.rows.length, 1);
+});
+
+test('multipart zonder bestanden werkt zoals json', async () => {
+  const { app, db } = maakApp();
+  const r = await postForm(app, geldig());
+  assert.equal(r.status, 200);
+  assert.equal(db.rows.length, 1);
+});
+
+test('uploads: opgeslagen bij de aanvraag en als bijlage in de mail naar Borg Expert', async () => {
+  const { app, db, mailer } = maakApp();
+  const r = await postForm(app, geldig(), { bouwmelding_doc: { inhoud: PDF, naam: '../Bevestiging bouwmelding.PDF', type: 'application/pdf' }, vergunning_doc: { inhoud: PNG, naam: 'vergunning.png', type: 'image/png' } });
+  assert.equal(r.status, 200, await r.text());
+  const bij = await db.bijlagen(db.rows[0].id);
+  assert.equal(bij.length, 2);
+  assert.deepEqual(bij.map((b) => [b.soort, b.bestandsnaam, b.mime]), [['bouwmelding', 'Bevestiging bouwmelding.pdf', 'application/pdf'], ['omgevingsvergunning', 'vergunning.png', 'image/png']]);
+  await wacht();
+  const intern = mailer.sent.find((m) => m.to.includes('info@borgexpert.nl'));
+  assert.equal(intern.attachments.length, 2);
+  assert.equal(intern.attachments[0].filename, 'Bevestiging bouwmelding.pdf');
+  assert.equal(Buffer.from(intern.attachments[0].content, 'base64').toString('latin1').slice(0, 5), '%PDF-');
+  assert.match(intern.text, /Bijlagen: Bevestiging bouwmelding.pdf \(bouwmelding/);
+  const bevestiging = mailer.sent.find((m) => m.to.includes('jan@example.com'));
+  assert.equal(bevestiging.attachments, undefined, 'aanvrager krijgt zijn eigen bestanden niet terug');
+});
+
+test('uploads: verkeerd type of te groot wordt geweigerd, niets opgeslagen', async () => {
+  const { app, db } = maakApp();
+  const exe = await postForm(app, geldig(), { bouwmelding_doc: { inhoud: Buffer.from('MZ\x90\x00 dit is geen pdf'), naam: 'virus.pdf', type: 'application/pdf' } });
+  assert.equal(exe.status, 400);
+  assert.match((await exe.json()).fout, /geen PDF, JPG of PNG/);
+  const groot = await postForm(app, geldig(), { vergunning_doc: { inhoud: Buffer.concat([PDF, Buffer.alloc(10 * 1024 * 1024 + 1)]), naam: 'groot.pdf', type: 'application/pdf' } });
+  assert.equal(groot.status, 400);
+  assert.match((await groot.json()).fout, /groter dan 10 MB/);
+  assert.equal(db.rows.length, 0);
+});
+
+test('uploads: retry stuurt de bijlagen alsnog mee', async () => {
+  const mailer = fakeMailer({ fail: true });
+  const { app, db, cfg } = maakApp({ mailer });
+  await postForm(app, geldig(), { bouwmelding_doc: { inhoud: PDF, naam: 'melding.pdf', type: 'application/pdf' } });
+  await wacht();
+  mailer.fail = false;
+  for (const x of await db.onverzonden()) await verstuurMails(x, { db, mailer, cfg, log: stilleLog });
+  const intern = mailer.sent.find((m) => m.to.includes('info@borgexpert.nl'));
+  assert.equal(intern.attachments.length, 1);
 });

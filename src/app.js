@@ -7,6 +7,7 @@ import { triage, faseLabel } from './triage.js';
 import { naarRij } from './db.js';
 import { interneMail, bevestigingsMail, esc } from './mail.js';
 import { createRateLimiter } from './ratelimit.js';
+import { leesBijlagen, SOORTEN, MAX_TOTAAL } from './bijlagen.js';
 
 const ALFABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // geen 0/O/1/I, prettig aan de telefoon
 
@@ -26,7 +27,7 @@ export function clientIp(c, trustProxy) {
 /** Verstuurt beide mails voor een rij en werkt de status bij. Fouten worden geregistreerd, nooit gegooid. */
 export async function verstuurMails(rij, { db, mailer, cfg, log }) {
   if (!rij.mail_verzonden_op) {
-    try { const m = interneMail(rij, cfg); m.idempotencyKey += '-p' + (rij.mail_pogingen || 0); await mailer.send(m); await db.markeerMail(rij.id, { verzonden: true }); rij.mail_verzonden_op = new Date(); }
+    try { const bijlagen = await db.bijlagen(rij.id); const m = interneMail(rij, cfg, bijlagen); m.idempotencyKey += '-p' + (rij.mail_pogingen || 0); await mailer.send(m); await db.markeerMail(rij.id, { verzonden: true }); rij.mail_verzonden_op = new Date(); }
     catch (e) { log.error(`[mail] intern ${rij.ref} mislukt: ${e.message}`); await db.markeerMail(rij.id, { verzonden: false, fout: e.message }); }
   }
   if (cfg.confirmationEmail && !rij.bevestiging_verzonden_op) {
@@ -100,7 +101,7 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
     return a ? c.json({ ok: true, adres: a }) : c.json({ ok: false }, 404);
   });
 
-  app.post('/api/aanvraag', bodyLimit({ maxSize: 64 * 1024, onError: (c) => c.json({ ok: false, fout: 'De aanvraag is te groot.' }, 413) }), async (c) => {
+  app.post('/api/aanvraag', bodyLimit({ maxSize: MAX_TOTAAL + 256 * 1024, onError: (c) => c.json({ ok: false, fout: 'De bijlagen zijn samen groter dan 15 MB. Verklein ze of stuur er één later na.' }, 413) }), async (c) => {
     // Alleen vanaf de eigen pagina
     const origin = c.req.header('origin');
     if (cfg.appUrl && origin && origin !== cfg.appUrl) return c.json({ ok: false, fout: 'Ongeldige herkomst.' }, 403);
@@ -108,8 +109,20 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
     const ip = clientIp(c, cfg.trustProxy);
     if (!limiter.allow(ip)) return c.json({ ok: false, fout: 'Te veel aanvragen achter elkaar. Probeer het over een kwartier nog eens, of bel ons direct.' }, 429);
 
-    let body;
-    try { body = await c.req.json(); } catch { return c.json({ ok: false, fout: 'Ongeldige aanvraag.' }, 400); }
+    let body, bijlagen = [];
+    const ct = c.req.header('content-type') || '';
+    try {
+      if (ct.startsWith('multipart/form-data')) {
+        const form = await c.req.parseBody();
+        const b = await leesBijlagen(form);
+        if (!b.ok) return c.json({ ok: false, fout: b.fout }, 400);
+        bijlagen = b.bijlagen;
+        body = {};
+        for (const [k, val] of Object.entries(form)) { if (k in SOORTEN) continue; if (typeof val !== 'string') return c.json({ ok: false, fout: 'Ongeldige aanvraag.' }, 400); body[k] = val; }
+      } else if (ct.includes('json')) {
+        body = await c.req.json();
+      } else { return c.json({ ok: false, fout: 'Ongeldige aanvraag.' }, 400); }
+    } catch { return c.json({ ok: false, fout: 'Ongeldige aanvraag.' }, 400); }
     const v = valideer(body);
     if (!v.ok) return c.json({ ok: false, fout: v.fout }, 400);
     const d = v.data;
@@ -129,7 +142,7 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
     for (let poging = 0; ; poging++) {
       const ref = nieuweRef(now());
       try {
-        rij = await db.insert(naarRij(d, { ref, triage: t, faseLabel: faseLabel(d), ip, userAgent: (c.req.header('user-agent') || '').slice(0, 300), ruw }));
+        rij = await db.insert(naarRij(d, { ref, triage: t, faseLabel: faseLabel(d), ip, userAgent: (c.req.header('user-agent') || '').slice(0, 300), ruw }), bijlagen);
         break;
       } catch (e) {
         if (e.code === '23505' && poging < 3) continue; // ref al in gebruik, nieuwe proberen
@@ -137,7 +150,7 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
         return c.json({ ok: false, fout: 'We konden je aanvraag niet opslaan. Bel ons direct op (085) 760 72 78, dan helpen we je meteen.' }, 500);
       }
     }
-    log.info(`[aanvraag] ${rij.ref} ${t} ${d.rol} ${d.adres}`);
+    log.info(`[aanvraag] ${rij.ref} ${t} ${d.rol} ${d.adres}${bijlagen.length ? ` (${bijlagen.length} bijlage${bijlagen.length > 1 ? 'n' : ''})` : ''}`);
 
     // Mail wordt na het antwoord verstuurd; mislukt dat, dan pakt de retry-lus het op.
     void verstuurMails(rij, { db, mailer, cfg, log });

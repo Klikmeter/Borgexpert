@@ -9,7 +9,9 @@ export function fakeDb() {
   return {
     rows,
     async init() {}, async ping() {},
-    async insert(rij) { if (rows.some((r) => r.ref === rij.ref)) { const e = new Error('dup'); e.code = '23505'; throw e; } const r = { id: rows.length + 1, aangemaakt_op: new Date(), mail_verzonden_op: null, bevestiging_verzonden_op: null, ...rij }; rows.push(r); return r; },
+    bijlagenPerAanvraag: new Map(),
+    async insert(rij, bijlagen = []) { if (rows.some((r) => r.ref === rij.ref)) { const e = new Error('dup'); e.code = '23505'; throw e; } const r = { id: rows.length + 1, aangemaakt_op: new Date(), mail_verzonden_op: null, bevestiging_verzonden_op: null, ...rij }; rows.push(r); this.bijlagenPerAanvraag.set(r.id, bijlagen); return r; },
+    async bijlagen(id) { return this.bijlagenPerAanvraag.get(id) || []; },
     async markeerMail(id, { verzonden, fout }) { const r = rows.find((x) => x.id === id); r.mail_pogingen = (r.mail_pogingen || 0) + 1; if (verzonden) r.mail_verzonden_op = new Date(); r.mail_fout = fout || null; },
     async markeerBevestiging(id, { verzonden, fout }) { const r = rows.find((x) => x.id === id); r.bevestiging_pogingen = (r.bevestiging_pogingen || 0) + 1; if (verzonden) r.bevestiging_verzonden_op = new Date(); r.bevestiging_fout = fout || null; },
     async onverzonden() { return rows.filter((r) => !r.mail_verzonden_op || !r.bevestiging_verzonden_op); },
@@ -54,3 +56,13 @@ export const post = (app, body, headers = {}) => app.request('https://www.borgex
 });
 
 export const wacht = (ms = 20) => new Promise((r) => setTimeout(r, ms));
+
+/** Multipart-post zoals de pagina die doet: velden plus optionele bestanden. */
+export const postForm = (app, velden, bestanden = {}, headers = {}) => {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(velden)) fd.append(k, v);
+  for (const [k, f] of Object.entries(bestanden)) fd.append(k, new File([f.inhoud], f.naam, { type: f.type || 'application/octet-stream' }));
+  return app.request('https://www.borgexpert.online/api/aanvraag', { method: 'POST', headers: { Origin: 'https://www.borgexpert.online', 'X-Forwarded-For': headers.ip || '10.0.0.9', ...headers }, body: fd });
+};
+export const PDF = Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF');
+export const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(64)]);

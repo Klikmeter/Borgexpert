@@ -216,6 +216,9 @@ section.alt{background:var(--white)}
 .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
 .formerr{margin-top:14px;padding:12px 14px;border-radius:8px;background:#FDECEC;color:#8A1C1C;font-size:14.5px;line-height:1.5}
 .cf-turnstile{margin-top:18px}
+.upload .pick{color:var(--muted)}
+.upload .chosen{display:block;margin-top:8px;color:var(--ink);font-weight:500}
+.upload.has .pick{font-size:13.5px}
 .consent{font-size:13px;color:var(--muted);line-height:1.5;margin-top:18px}
 
 /* ---------- plan ---------- */
@@ -380,6 +383,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
               <span class="msg">Kies een antwoord. "Weet ik niet" is ook prima.</span>
             </div>
             <div class="field only" id="f-dsodatum" data-key="dsodatum"><label for="dsodatum">Wanneer is de melding gedaan? <span class="opt">ongeveer is goed</span></label><input id="dsodatum" name="dsodatum" type="date"></div>
+            <div class="field only" id="f-dsodoc"><span class="lab">Is de bouwmelding al akkoord? Upload dan het document <span class="opt">optioneel</span></span><label class="upload"><input type="file" id="dsodoc" name="bouwmelding_doc" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><span class="pick"><b>Kies een bestand</b> (PDF, JPG of PNG, maximaal 10 MB)</span><span class="chosen" hidden></span></label><span class="msg"></span></div>
             <div class="field" data-key="vergunning">
               <span class="lab">Is de omgevingsvergunning toegekend door de gemeente?</span>
               <div class="tiles cols-3">
@@ -388,6 +392,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
                 <label class="tile"><input type="radio" name="vergunning" value="weet"><span class="dot"></span>Weet ik niet</label>
               </div>
             </div>
+            <div class="field only" id="f-vergdoc"><span class="lab">Upload hier de omgevingsvergunning <span class="opt">optioneel</span></span><label class="upload"><input type="file" id="vergdoc" name="vergunning_doc" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><span class="pick"><b>Kies een bestand</b> (PDF, JPG of PNG, maximaal 10 MB)</span><span class="chosen" hidden></span></label><span class="msg"></span></div>
             <div class="field" data-key="borger">
               <label for="borger">Wie was je kwaliteitsborger tot nu toe?</label>
               <select id="borger" name="borger">
@@ -626,6 +631,8 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     $('#f-bedrijf').classList.toggle('on', rol === 'aannemer' || rol === 'anders');
     $('#aannemer-only').classList.toggle('on', rol === 'aannemer');
     $('#f-dsodatum').classList.toggle('on', val('dso') === 'ja');
+    $('#f-dsodoc').classList.toggle('on', val('dso') === 'ja');
+    $('#f-vergdoc').classList.toggle('on', val('vergunning') === 'ja');
     $('#f-borgeranders').classList.toggle('on', val('borger') === 'anders');
     $('#sub-fund').classList.toggle('on', val('fase') === '2');
     $('#sub-verd').classList.toggle('on', val('fase') === '4');
@@ -688,6 +695,18 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     inp.addEventListener('blur', () => setTimeout(sluit, 150));
   })();
 
+
+  // ---- uploads: naam tonen en grootte/type vooraf controleren
+  const MAX_BESTAND = 10 * 1024 * 1024;
+  $$('input[type=file]', frm).forEach(inp => inp.addEventListener('change', () => {
+    const field = inp.closest('.field'), box = inp.closest('.upload'), chosen = box.querySelector('.chosen'), msg = field.querySelector('.msg');
+    const f = inp.files[0];
+    field.classList.remove('err'); msg.textContent = '';
+    if (!f) { chosen.hidden = true; box.classList.remove('has'); return; }
+    if (f.size > MAX_BESTAND) { inp.value = ''; chosen.hidden = true; box.classList.remove('has'); msg.textContent = 'Dit bestand is groter dan 10 MB. Verklein het of stuur het later na.'; field.classList.add('err'); return; }
+    if (!/\.(pdf|jpe?g|png)$/i.test(f.name)) { inp.value = ''; chosen.hidden = true; box.classList.remove('has'); msg.textContent = 'Alleen PDF, JPG of PNG.'; field.classList.add('err'); return; }
+    chosen.textContent = f.name + ' (' + Math.max(1, Math.round(f.size / 1024)) + ' kB)'; chosen.hidden = false; box.classList.add('has');
+  }));
 
   // ---- steps
   function show(n) {
@@ -755,7 +774,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     if (d.rapport !== 'ja') need.push('Alles wat je hebt van de vorige borger: rapportages, foto\'s, mails');
     else need.push('De rapportages en foto\'s van je vorige borger');
     if (d.plan !== 'ja') need.push('Het borgingsplan en de risicobeoordeling, als je die kunt vinden');
-    if (d.dso === 'ja') need.push('De bevestiging van de bouwmelding uit het Omgevingsloket');
+    if (d.dso === 'ja' && !($('#dsodoc').files[0])) need.push('De bevestiging van de bouwmelding uit het Omgevingsloket');
     need.push('De contactgegevens van je ' + (d.rol === 'particulier' ? 'aannemer' : 'opdrachtgever'));
     const now = [];
     if (d.gemeente !== 'ja') now.push('Laat de gemeente weten dat je een nieuwe kwaliteitsborger regelt. Dat voorkomt een formele stillegging');
@@ -794,8 +813,11 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     const err = $('#formerr'); err.hidden = true;
     const ts = frm.elements['cf-turnstile-response'];
     const body = {...d, bron, turnstile: ts ? ts.value : ''};
+    const fd = new FormData();
+    Object.entries(body).forEach(([k, v]) => fd.append(k, v));
+    $$('input[type=file]', frm).forEach(inp => { if (inp.files[0] && inp.closest('.field').classList.contains('on')) fd.append(inp.name, inp.files[0]); });
     try {
-      const r = await fetch('/api/aanvraag', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+      const r = await fetch('/api/aanvraag', {method: 'POST', body: fd});
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.ok) throw new Error(j.fout || FOUT_ALGEMEEN);
       $('#mailnote').textContent = 'Ontvangen. We bellen je uiterlijk ' + nextWorkday();
@@ -807,7 +829,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
       if (window.turnstile && ts) { try { window.turnstile.reset(); } catch (e3) {} }
     } finally { btn.disabled = false; }
   });
-  $('#again').addEventListener('click', () => { frm.reset(); refreshConditional(); $('#plan').classList.remove('on'); document.body.classList.remove('plan-open'); frm.style.display = ''; show(1); });
+  $('#again').addEventListener('click', () => { frm.reset(); $$('.upload .chosen', frm).forEach(c => { c.hidden = true; c.closest('.upload').classList.remove('has'); }); refreshConditional(); $('#plan').classList.remove('on'); document.body.classList.remove('plan-open'); frm.style.display = ''; show(1); });
 
   // resume at saved step
   try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && s.step > 1 && !prefilled) show(s.step); } catch (e) {}

@@ -40,14 +40,16 @@ export function velden(rij) {
 }
 
 /** Mail naar de inbox van Borg Expert. */
-export function interneMail(rij, cfg) {
+export function interneMail(rij, cfg, bijlagen = []) {
   const v = velden(rij);
+  if (bijlagen.length) v.push(['Bijlagen', bijlagen.map((b) => `${b.bestandsnaam} (${b.soort}, ${Math.round(b.grootte / 1024)} kB)`).join('\n')]);
   const subject = `Bouwstop-aanvraag ${rij.ref} · ${TRIAGE_LABEL[rij.triage] || rij.triage} · ${rij.adres}`;
   const text = `Nieuwe aanvraag via ${cfg.appUrl || 'de bouwstop-pagina'}\n\n` + v.map(([k, w]) => `${k}: ${w}`).join('\n') + `\n\nBeantwoord deze mail om de aanvrager direct te bereiken.`;
   const rows = v.map(([k, w]) => `<tr><td style="padding:6px 12px 6px 0;color:#666;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:6px 0;vertical-align:top">${esc(w).replace(/\n/g, '<br>')}</td></tr>`).join('');
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#333;line-height:1.5"><p>Nieuwe aanvraag via ${esc(cfg.appUrl || 'de bouwstop-pagina')}.</p><table cellpadding="0" cellspacing="0" style="border-collapse:collapse">${rows}</table><p style="color:#666;font-size:13px">Beantwoord deze mail om de aanvrager direct te bereiken.</p></div>`;
   const m = { from: cfg.emailFrom, to: cfg.emailTo.split(',').map((x) => x.trim()).filter(Boolean), reply_to: rij.email, subject, text, html, idempotencyKey: `intern-${rij.ref}` };
   if (cfg.emailBcc?.length) m.bcc = cfg.emailBcc;
+  if (bijlagen.length) m.attachments = bijlagen.map((b) => ({ filename: b.bestandsnaam, content: Buffer.from(b.inhoud).toString('base64'), content_type: b.mime }));
   return m;
 }
 
