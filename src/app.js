@@ -71,7 +71,7 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, log = c
       .replaceAll('__TURNSTILE_SCRIPT__', ts ? `<script nonce="${nonce}" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : '')
       .replaceAll('__TURNSTILE_WIDGET__', ts ? `<div class="cf-turnstile" data-sitekey="${esc(ts)}" data-language="nl" data-size="flexible"></div>` : '');
     c.header('Content-Security-Policy', [
-      "default-src 'self'", `script-src 'nonce-${nonce}' https://challenges.cloudflare.com`, 'frame-src https://challenges.cloudflare.com',
+      "default-src 'self'", `script-src 'nonce-${nonce}' https://challenges.cloudflare.com`, 'frame-src https://challenges.cloudflare.com https://www.google.com',
       "style-src 'self' 'unsafe-inline'", "img-src 'self' data:", "font-src 'self'", "connect-src 'self'", "base-uri 'none'", "form-action 'self'", "frame-ancestors 'none'", "object-src 'none'",
     ].join('; '));
     c.header('Cache-Control', 'no-cache');

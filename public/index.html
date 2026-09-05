@@ -107,6 +107,23 @@ section.alt{background:var(--white)}
 .always-list li{display:grid;grid-template-columns:32px 1fr;column-gap:16px;counter-increment:al}
 .always-list li::before{content:counter(al);grid-row:1/3;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--slab);font-size:15px;display:grid;place-items:center}
 .always-list b{font-weight:600;font-size:16px;color:var(--ink)}
+.contact{display:grid;grid-template-columns:1.1fr .9fr 1.2fr;gap:48px;align-items:start}
+.contact h2{margin-bottom:22px}
+.contact .sub{font-weight:600;color:var(--ink);margin-bottom:10px}
+.hours{display:grid;grid-template-columns:auto 1fr;column-gap:18px;row-gap:6px;margin:0 0 18px;color:var(--text);font-size:15.5px}
+.hours dt{color:var(--muted)}
+.hours dd{margin:0}
+.contact .hint{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:22px}
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.lines li{display:flex;align-items:center;gap:10px;font-size:16px}
+.lines svg{width:18px;height:18px;color:var(--blue);flex:none}
+.lines a{color:var(--blue);font-weight:600;text-decoration:none}
+.lines a:hover{text-decoration:underline}
+.contact .addr{color:var(--text);font-size:16px;line-height:1.7;margin-bottom:18px}
+.route{display:inline-block;color:var(--blue);font-weight:600;text-decoration:none;border-bottom:2px solid var(--blue-pale)}
+.route:hover{border-color:var(--blue)}
+.map{border-radius:14px;overflow:hidden;background:var(--ground-2);aspect-ratio:4/3;min-height:320px}
+.map iframe{display:block;width:100%;height:100%;border:0}
 .always-list span{color:var(--text);font-size:15px;line-height:1.65;margin-top:4px}
 .trust{max-width:760px}
 .trust .photo{border-radius:10px;overflow:hidden;aspect-ratio:4/3;box-shadow:var(--shadow)}
@@ -219,6 +236,8 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   .hero .lede{margin-top:12px;font-size:16px}
   :root{--overlap:260px}
   .always{grid-template-columns:1fr;padding:28px 24px;gap:24px}
+  .contact{grid-template-columns:1fr;gap:36px}
+  .map{min-height:260px}
   .hero{border-bottom-right-radius:56px}
   .three,.steps{grid-template-columns:1fr}
   .step{border-right:0;margin-right:0;padding:26px 0;border-top:1px solid var(--line)}
@@ -484,6 +503,38 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
 </section>
 
 
+
+<section class="block alt" id="contact">
+  <div class="wrap contact">
+    <div>
+      <h2>Contactgegevens</h2>
+      <p class="sub">Openingstijden</p>
+      <dl class="hours">
+        <dt>Maandag</dt><dd>08:30 tot 17:00 uur</dd>
+        <dt>Dinsdag</dt><dd>08:30 tot 17:00 uur</dd>
+        <dt>Woensdag</dt><dd>08:30 tot 17:00 uur</dd>
+        <dt>Donderdag</dt><dd>08:30 tot 17:00 uur</dd>
+        <dt>Vrijdag</dt><dd>08:30 tot 17:00 uur</dd>
+        <dt>Zaterdag en zondag</dt><dd>Gesloten</dd>
+      </dl>
+      <p class="hint">Bij een bouwstop zijn we ook buiten kantoortijd bereikbaar via WhatsApp.</p>
+      <ul class="lines">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><a href="tel:+31857607278">(085) 760 72 78</a></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3z"/><path d="M9.5 9.5c0 3 2 5 5 5l1-1.5-2-1-1 1a4 4 0 0 1-1.5-1.5l1-1-1-2z"/></svg><a href="https://wa.me/31686800095" target="_blank" rel="noopener">06 86 80 00 95 (WhatsApp)</a></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:info@borgexpert.nl">info@borgexpert.nl</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Locatie</h2>
+      <p class="sub">Enschede (hoofdkantoor)</p>
+      <p class="addr">Brouwerijstraat 1<br>7523 XC Enschede</p>
+      <a class="route" href="https://www.google.com/maps/dir/?api=1&destination=Brouwerijstraat+1,+7523+XC+Enschede" target="_blank" rel="noopener">Route plannen</a>
+    </div>
+    <div class="map">
+      <iframe title="Kaart: Brouwerijstraat 1, Enschede" src="https://www.google.com/maps?q=Brouwerijstraat+1,+7523+XC+Enschede&z=15&hl=nl&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
 
 <footer>
   <div class="wrap">
