@@ -26,7 +26,7 @@ test('pagina: nonce in CSP en script, fonts lokaal, geen Turnstile zonder siteke
 });
 
 test('pagina: met sitekey wordt Turnstile ingeladen', async () => {
-  const { app } = maakApp({ env: { TURNSTILE_SITE_KEY: '1x000' } });
+  const { app } = maakApp({ env: { TURNSTILE_SITE_KEY: '1x000', TURNSTILE_SECRET_KEY: 's' } });
   const html = await (await app.request('https://www.borgexpert.online/')).text();
   assert.ok(html.includes('challenges.cloudflare.com/turnstile/v0/api.js'));
   assert.ok(html.includes('class="cf-turnstile" data-sitekey="1x000"'));
@@ -197,7 +197,7 @@ test('gekozen adres: losse kolommen in de database en gemeente in de mail', asyn
 test('turnstile met maar één sleutel: uitgeschakeld, aanvraag gaat gewoon door', async () => {
   const { app, db } = maakApp({ env: { TURNSTILE_SECRET_KEY: 's' }, verifyTurnstile: async () => false });
   const html = await (await app.request('https://www.borgexpert.online/')).text();
-  assert.ok(!html.includes('cf-turnstile'));
+  assert.ok(!html.includes('class="cf-turnstile"'));
   assert.equal((await post(app, geldig())).status, 200);
   assert.equal(db.rows.length, 1);
 });
