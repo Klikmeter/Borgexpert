@@ -48,6 +48,7 @@ test/               node:test, draait zonder database (`npm test`)
 | `APP_URL` | `https://www.borgexpert.online` |
 | `CANONICAL_REDIRECT` | `false` tot het domein werkt, daarna `true` |
 | `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | uit Cloudflare Turnstile, zie stap 5 |
+| `GA_MEASUREMENT_ID` | optioneel, Google Analytics 4 (`G-...`); zet de Google-tag en een cookiebalk op de pagina, event `generate_lead` bij een aanvraag |
 
 Zonder `RESEND_API_KEY` draait alles, maar blijven de mails in de wachtrij tot de key er is.
 

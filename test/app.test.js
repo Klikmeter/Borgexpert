@@ -11,7 +11,8 @@ test('pagina: nonce in CSP en script, fonts lokaal, geen Turnstile zonder siteke
   const nonce = csp.match(/nonce-([^']+)/)[1];
   const html = await r.text();
   assert.ok(html.includes(`<script nonce="${nonce}">`));
-  assert.ok(!html.includes('__CSP_NONCE__') && !html.includes('__TURNSTILE'));
+  assert.ok(!html.includes('__CSP_NONCE__') && !html.includes('__TURNSTILE') && !html.includes('__GA_SCRIPT__'));
+  assert.ok(!html.includes('googletagmanager'), 'zonder GA_MEASUREMENT_ID geen Google-tag');
   assert.ok(!html.includes('challenges.cloudflare.com'));
   assert.ok(!html.includes('fonts.googleapis.com'));
   assert.ok(html.includes('/fonts/fonts.css'));
@@ -246,4 +247,18 @@ test('uploads: retry stuurt de bijlagen alsnog mee', async () => {
   for (const x of await db.onverzonden()) await verstuurMails(x, { db, mailer, cfg, log: stilleLog });
   const intern = mailer.sent.find((m) => m.to.includes('info@borgexpert.nl'));
   assert.equal(intern.attachments.length, 1);
+});
+
+test('Google-tag: alleen met GA_MEASUREMENT_ID, met consent default denied en CSP voor Google', async () => {
+  const { app } = maakApp({ env: { GA_MEASUREMENT_ID: 'G-RZCHT5KEBL' } });
+  const r = await app.request('https://www.borgexpert.online/');
+  const html = await r.text();
+  const nonce = r.headers.get('content-security-policy').match(/nonce-([^']+)/)[1];
+  assert.ok(html.includes(`<script nonce="${nonce}" async src="https://www.googletagmanager.com/gtag/js?id=G-RZCHT5KEBL"></script>`));
+  assert.match(html, /gtag\('consent','default',\{analytics_storage:'denied'/);
+  assert.match(html, /gtag\('config','G-RZCHT5KEBL'\)/);
+  assert.match(r.headers.get('content-security-policy'), /script-src [^;]*https:\/\/www\.googletagmanager\.com/);
+  assert.match(r.headers.get('content-security-policy'), /connect-src [^;]*google-analytics\.com/);
+  const fout = maakApp({ env: { GA_MEASUREMENT_ID: 'AW-123/abc' } });
+  assert.ok(!(await (await fout.app.request('https://www.borgexpert.online/')).text()).includes('googletagmanager'), 'ongeldig id wordt genegeerd');
 });

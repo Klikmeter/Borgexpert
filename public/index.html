@@ -32,6 +32,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Ligt je bouw stil omdat je kwaliteitsborger is weggevallen? Meld je project aan en een kwaliteitsborger van Borg Expert belt je binnen één werkdag met een plan.">
 __TURNSTILE_SCRIPT__
+__GA_SCRIPT__
 </head>
 <body>
 <style>
@@ -252,7 +253,12 @@ section.alt{background:var(--white)}
 .plan-nav{border:0;padding-top:20px;flex-wrap:wrap;justify-content:flex-end}
 .plan-nav .btn.quiet{order:2;flex-basis:100%;justify-content:flex-start;padding-inline:0;margin-top:6px}
 .plan-nav .btn.outline{padding-inline:22px;letter-spacing:1.5px}
-body.plan-open .stickybar{display:none}
+body.plan-open .cookies{position:fixed;left:16px;bottom:16px;z-index:30;width:min(440px,calc(100% - 32px));background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 40px rgba(20,30,60,.16);padding:18px 20px}
+.cookies p{font-size:14.5px;line-height:1.55;color:var(--text);margin:0 0 14px}
+.cookies a{color:var(--blue)}
+.cookies .acts{display:flex;gap:8px;flex-wrap:wrap}
+.cookies .btn{padding:11px 18px;font-size:13px;letter-spacing:1.5px}
+.stickybar{display:none}
 .ref{margin-top:30px;display:grid;gap:8px}
 .ref strong{font-size:20px;line-height:1.35;color:var(--ink);font-weight:600}
 .ref span{font-family:var(--slab);font-size:14px;color:var(--muted)}
@@ -267,6 +273,11 @@ footer .fine a{color:rgba(255,255,255,.8)}
 footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);font-size:13px;color:rgba(255,255,255,.55)}
 
 /* ---------- mobile ---------- */
+.cookies{position:fixed;left:16px;bottom:16px;z-index:30;width:min(440px,calc(100% - 32px));background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 40px rgba(20,30,60,.16);padding:18px 20px}
+.cookies p{font-size:14.5px;line-height:1.55;color:var(--text);margin:0 0 14px}
+.cookies a{color:var(--blue)}
+.cookies .acts{display:flex;gap:8px;flex-wrap:wrap}
+.cookies .btn{padding:11px 18px;font-size:13px;letter-spacing:1.5px}
 .stickybar{display:none}
 @media (max-width:900px){
   .hero-body{padding-top:16px}
@@ -276,6 +287,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   .gbadge{margin-top:18px;font-size:13px;padding:8px 14px 8px 12px}
   .hero .lede{margin-top:12px;font-size:16px}
   :root{--overlap:260px}
+  .cookies{left:10px;bottom:76px;width:calc(100% - 20px)}
   .always{grid-template-columns:1fr;padding:28px 24px;gap:24px}
   .contact{grid-template-columns:1fr;gap:36px}
   .map{min-height:260px}
@@ -592,6 +604,10 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
   </div>
 </footer>
 
+<div class="cookies" id="cookies" role="dialog" aria-label="Cookies" hidden>
+  <p>We meten met Google of deze pagina en onze advertenties werken. Daarvoor vragen we je toestemming voor cookies. <a href="https://www.borgexpert.nl" target="_blank" rel="noopener">Privacyverklaring</a></p>
+  <div class="acts"><button type="button" class="btn" id="ck-ja">Akkoord</button><button type="button" class="btn quiet" id="ck-nee">Alleen noodzakelijk</button></div>
+</div>
 <div class="stickybar" aria-hidden="true"><a class="call" href="tel:+31857607278">Bellen</a><a class="go" href="#aanvraag">Start aanvraag</a></div>
 
 <script nonce="__CSP_NONCE__">
@@ -709,6 +725,19 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
     chosen.textContent = f.name + ' (' + Math.max(1, Math.round(f.size / 1024)) + ' kB)'; chosen.hidden = false; box.classList.add('has');
   }));
 
+  // ---- cookies en meten (alleen als de Google-tag op de pagina staat)
+  const CK = 'be-cookies';
+  const consent = ok => { if (window.gtag) gtag('consent', 'update', ok ? {analytics_storage: 'granted', ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted'} : {analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied'}); };
+  if (window.gtag) {
+    let keuze = null; try { keuze = localStorage.getItem(CK); } catch (e) {}
+    if (keuze === 'alles') consent(true);
+    else if (keuze !== 'noodzakelijk') { $('#cookies').hidden = false; }
+    const kies = ok => { try { localStorage.setItem(CK, ok ? 'alles' : 'noodzakelijk'); } catch (e) {} consent(ok); $('#cookies').hidden = true; };
+    $('#ck-ja').addEventListener('click', () => kies(true));
+    $('#ck-nee').addEventListener('click', () => kies(false));
+  }
+  const meet = (naam, data) => { try { if (window.gtag) gtag('event', naam, data || {}); } catch (e) {} };
+
   // ---- steps
   function show(n) {
     step = n;
@@ -823,6 +852,7 @@ footer .fine{margin-top:36px;padding-top:20px;border-top:1px solid rgba(255,255,
       if (!r.ok || !j.ok) throw new Error(j.fout || FOUT_ALGEMEEN);
       $('#mailnote').textContent = 'Ontvangen. We bellen je uiterlijk ' + nextWorkday();
       $('#wa').href = 'https://wa.me/31686800095?text=' + encodeURIComponent('Hallo, ik heb zojuist een bouwstop-aanvraag gedaan met referentie ' + j.ref + '.');
+      meet('generate_lead', {triage: plan.t, rol: d.rol, bron: bron, fase: d.fase});
       renderPlan(d, plan, j.ref);
       try { localStorage.removeItem(KEY); } catch (e2) {}
     } catch (e1) {

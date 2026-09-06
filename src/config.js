@@ -19,6 +19,8 @@ export function loadConfig(env = process.env) {
     // Optioneel: extra ontvangers van de aanvraagmail als blinde kopie, kommagescheiden (bijv. voor controle).
     emailBcc: (env.EMAIL_BCC || '').split(',').map((x) => x.trim()).filter(Boolean),
     confirmationEmail: bool(env.CONFIRMATION_EMAIL, true),
+    // Google Analytics 4 (G-XXXX). Leeg = geen Google-tag en geen cookiebalk.
+    gaMeasurementId: /^G-[A-Z0-9]{4,20}$/.test((env.GA_MEASUREMENT_ID || '').trim()) ? env.GA_MEASUREMENT_ID.trim() : '',
     turnstileSiteKey: env.TURNSTILE_SITE_KEY || '',
     turnstileSecretKey: env.TURNSTILE_SECRET_KEY || '',
     // Alleen actief als beide sleutels er zijn; met één sleutel zou elke aanvraag geweigerd worden.

@@ -75,12 +75,19 @@ export function createApp({ cfg, db, mailer, verifyTurnstile, indexHtml, adres, 
       .replaceAll('__APP_URL__', cfg.appUrl)
       .replaceAll('__TURNSTILE_SCRIPT__', ts ? `<script nonce="${nonce}" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>` : '')
       .replaceAll('__TURNSTILE_WIDGET__', ts ? `<div class="cf-turnstile" data-sitekey="${esc(ts)}" data-language="nl" data-size="flexible"></div>` : '');
+    const ga = cfg.gaMeasurementId;
+    const gaScript = ga ? `<script nonce="${nonce}" async src="https://www.googletagmanager.com/gtag/js?id=${ga}"></script>
+<script nonce="${nonce}">window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});
+gtag('js',new Date());gtag('config','${ga}');</script>` : '';
+    const htmlMetGa = html.replaceAll('__GA_SCRIPT__', gaScript);
+    const g = ga ? ' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://www.google.com https://www.google.nl' : '';
     c.header('Content-Security-Policy', [
-      "default-src 'self'", `script-src 'nonce-${nonce}' https://challenges.cloudflare.com`, 'frame-src https://challenges.cloudflare.com https://www.google.com',
-      "style-src 'self' 'unsafe-inline'", "img-src 'self' data:", "font-src 'self'", "connect-src 'self'", "base-uri 'none'", "form-action 'self'", "frame-ancestors 'none'", "object-src 'none'",
+      "default-src 'self'", `script-src 'nonce-${nonce}' https://challenges.cloudflare.com${ga ? ' https://www.googletagmanager.com' : ''}`, `frame-src https://challenges.cloudflare.com https://www.google.com${ga ? ' https://td.doubleclick.net' : ''}`,
+      "style-src 'self' 'unsafe-inline'", `img-src 'self' data:${g}`, "font-src 'self'", `connect-src 'self'${g}`, "base-uri 'none'", "form-action 'self'", "frame-ancestors 'none'", "object-src 'none'",
     ].join('; '));
     c.header('Cache-Control', 'no-cache');
-    return c.html(html);
+    return c.html(htmlMetGa);
   });
 
   // Adressuggesties (PDOK via onze server, zodat de pagina alleen met zichzelf praat)
